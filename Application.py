@@ -1,14 +1,12 @@
 from multiprocessing.connection import Client
 import random
-
-
+    
 class AppServer():
-    inst = dict()
     address_AppServer = '127.0.0.1'
     port_AppServer = 5723
     authkey_AppServer = b'vf@pnml1234'
     app_name = 'default'
-    serial_number = random.randrange(1,10,000)
+    serial_number = str(random.randrange(1,10000))
 
     def __init__(self) -> None:
         pass
@@ -19,8 +17,8 @@ class AppServer():
         self.ask(message)
         
     def addInstrument(self,name):
-        address,authkey_coord = self.askPort(name)
-        coordinator = Coordinator(address,authkey_coord)
+        address_serviceLine,authkey_serviceLine = self.askPort(name)
+        coordinator = Coordinator(address_serviceLine,authkey_serviceLine)
         return coordinator
 
     def askPort(self,inst_name):
@@ -42,13 +40,13 @@ class AppServer():
 
 class Coordinator():
     def __init__(self,link_address,authkey):
-        # self.address , self.port = link_address
+        # print(link_address)
         self.port_app_inst= Client(link_address, authkey=authkey)
     
-    def __del__(self):
-        self.port_app_inst.send("kill")
-        answer = self.port_app_inst.recv()
-        self.port_app_inst.close()
+    # def __del__(self):
+    #     self.port_app_inst.send("kill")
+    #     answer = self.port_app_inst.recv()
+    #     self.port_app_inst.close()
 
     def set(self,question):
         pass
