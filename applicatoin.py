@@ -1,28 +1,41 @@
 from multiprocessing.connection import Client
+import random
 
 
 class AppServer():
     inst = dict()
-    address = '127.0.0.1'
-    port = 5723
+    address_AppServer = '127.0.0.1'
+    port_AppServer = 5723
+    authkey_AppServer = b'vf@pnml1234'
+    app_name = 'default'
+    serial_number = random.randrange(1,10,000)
 
     def __init__(self) -> None:
-
-        self.port_app_kern= Client((self.address,self.port), authkey=b'vf@pnml1234')
         pass
 
     def __del__(self):
-        pass
+        message = "app_request-close_app"
+        message += '-'+self.app_name+'-'+self.serial_number
+        self.ask(message)
         
     def addInstrument(self,name):
-        address,authkey = self.askPort(name)
-        coordinator = Coordinator(address,authkey)
+        address,authkey_coord = self.askPort(name)
+        coordinator = Coordinator(address,authkey_coord)
         return coordinator
 
-    def askPort(self,name):
-        
-
-
+    def askPort(self,inst_name):
+        message = "app_request-new_app"
+        message += '-'+self.app_name+'-'+self.serial_number
+        message += '-'+inst_name
+        return self.ask(message)
+    
+    def ask(self,message):
+        port_app_kern =  Client((self.address_AppServer,self.port_AppServer),
+                                authkey=self.authkey_AppServer)
+        port_app_kern.send(message)
+        info = port_app_kern.recv()
+        port_app_kern.close()
+        return info
 
 
 
@@ -31,6 +44,11 @@ class Coordinator():
     def __init__(self,link_address,authkey):
         # self.address , self.port = link_address
         self.port_app_inst= Client(link_address, authkey=authkey)
+    
+    def __del__(self):
+        self.port_app_inst.send("kill")
+        answer = self.port_app_inst.recv()
+        self.port_app_inst.close()
 
     def set(self,question):
         pass
