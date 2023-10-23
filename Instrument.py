@@ -3,14 +3,13 @@ from multiprocessing.connection import Listener,Client
 from queue import Queue
 from InstrumentKernel import InstrumentServer, InstrumentController, ServiceLine
 
-#get this from kernel during the launch
+
 ######################################
+#get this from kernel during the launch
 from inst_dog import Inst
 address_InstServer = '127.0.0.1'
-address_ServiceLine = '127.0.0.1'
 port_InstServer = 7788
-authkey_InstCoor = b'vf@pnml4321'
-authkey_serviceLine = b'vf@pnml9876'
+authkey_InstServer = b'vf@pnml5193'
 ######################################
 
 thread_pool = dict()
@@ -22,10 +21,10 @@ que_command = Queue()
 
 #bootstraping the instrument
 #run the coordinator
-coordinator = InstrumentServer(queue_serviceLine)
-t_coordinator = Thread(target=coordinator.server, args=((address_InstServer,port_InstServer),
-                       authkey_InstCoor))
-t_coordinator.start()
+instServer = InstrumentServer(queue_serviceLine)
+t_instServer = Thread(target=instServer.server, args=((address_InstServer,port_InstServer),
+                       authkey_InstServer))
+t_instServer.start()
 
 
 #run the instrument controller
@@ -36,12 +35,13 @@ t_controller.start()
 
 #maintaining the serviceLine
 while True:
-    request = queue_serviceLine.get()
-    pieces = request.split('-')
-    if pieces[0] == "open":
-        port = int(pieces[1])
+    commend , arg = queue_serviceLine.get()
+
+    if commend == "open":
+        address_port , authkey = arg
+        port = address_port[1]
         que_respond[port] = Queue()
-        ser = ServiceLine((address_ServiceLine,port),authkey_serviceLine,
+        ser = ServiceLine(address_port,authkey,
                           que_command,que_respond[port])
     #create a thread with port# pieces[1]
         thread = Thread(target=ser.run(), args=(port))
@@ -50,15 +50,15 @@ while True:
     #run the thread
         thread.start()
 
-    elif pieces[0] == "close":
-        port = int(pieces[1])
+    elif commend == "close":
+        port = arg
         thread = thread_pool[port]
         thread.terminate()
         del thread_pool[port]
         del que_respond[port]
 
 
-    elif pieces[0] == "kill":
+    elif commend == "kill":
         print("kill this instrument")
     #implement the shut down here
     #stop controller
@@ -66,8 +66,12 @@ while True:
     #stop coordinator
     #break the while loop
 
+    elif commend == "test":
+        print("roger that!")
+
     else:
-        print("error message: "+message)
+        print("error message: ")
+        print(commend,arg)
         raise    
 
 
