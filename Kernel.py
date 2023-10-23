@@ -39,11 +39,13 @@ class System():
     def __init__(self):
         pass
 
-    # def generate_port(self):
-    #     for i in range(0,self.n_port_inst_app):
-    #         self.port_inst_app[self.port_inst_app_base+i] = ['empty']
-    #     for i in range(0,self.n_port_InstServer):
-    #         self.port_InstServer[self.port_InstServer+i] = ['empty']
+    def kill_InstServ(self,name):
+        self.queue_InstServer[name].put(("kill",0))
+        print("goaway")
+        port = self.port_InstServer[name]
+        del self.port_InstServer[name]
+        self.port_InstServer_available.append(port)
+
 
 class Shell():
     def __init__(self,jobs,sys):
@@ -56,9 +58,7 @@ class Shell():
         while self.sys.status:
             data = str(input())
             self.jobs.put(data)
-            #commend:
-            #check port dict
-            #
+            if data in ['exit',"quit","stop","exit()" ]: break
 
 
 class AppServer():
@@ -68,10 +68,54 @@ class AppServer():
     def server(self):
         port_AppServer = Listener((self.sys.address_AppServer,self.sys.port_AppServer) , 
                                   authkey= self.sys.authkey_AppServer)
+        port_AppServer._listener._socket.settimeout(1)
+
+        while self.sys.status:
+            try: 
+                client = port_AppServer.accept()
+                while self.sys.status:
+                    try:
+                        msg = client.recv() #msg in app_request-new_app-app_name-serial(0~10,000)-instrumen_name
+                        pieces = msg.split('-')
+                        
+                        if pieces[0] != "app_request": self.errorRequest(msg)
+
+                        if pieces[1] == "new_app":
+                            #check if the instrument exist
+                            if not self.checkInstrument(pieces[4]): self.errorRequest('no such instrument')
+                            #prepare a port for application
+                            port = self.createPort(pieces[2]+'-'+pieces[3]+'-'+pieces[4])   #app_name - serial
+
+                            #request instrumentServer to coordinate instrument
+                            commend = "open"
+                            arg = ( ( self.sys.address_inst_app, port) , self.sys.authkey_inst_app)
+                            self.sys.queue_InstServer[pieces[4]].put((commend,arg))
+
+                            #let application know the address , port number, authkey
+                            result = ( (self.sys.address_inst_app , port) 
+                                        , self.sys.authkey_inst_app)
+
+                        elif pieces[1] == "close_app":  #coming from application's destructor
+                            #release port
+                            ports,insts = self.searchport([pieces[2] , pieces[3]])
+                            self.sys.port_inst_app_available += ports
+                            #tell the instrumentServer
+                            for i in range(len(ports)):
+                                message = ("close",ports[i])
+                                self.sys.queue_InstServer[insts[i]].put(message)
+                                print("release ports:",ports[i],"from instrument: ", insts[i])
+
+                            #let application know the address , port number, authkey
+                            result = "bye"
+                        client.send(result)
+                    except EOFError:
+                        client = port_AppServer.accept()
+            except:
+                pass
+
 
         while self.sys.status:
             try:
-                client = port_AppServer.accept()
                 msg = client.recv() #msg in app_request-new_app-app_name-serial(0~10,000)-instrumen_name
                 pieces = msg.split('-')
                 
@@ -155,14 +199,20 @@ class InstrumentServer():
                                     authkey=self.sys.authkey_InstServer)
 
     def __del__(self):
-        self.port.send(("kill",0))
+        # self.port.send(("kill",0))
+        # print("goaway4")
         self.port.close()
 
     def server(self):
         while self.sys.status:
             request = self.sys.queue_InstServer[self.name].get()
+            # print("goaway2")
+            # if request == ("kill",0): break
             self.port.send(request)
             self.port.recv()
+            # print("goaway3")
+            if request == ("kill",0): break
+        print("InstrumentServer: ",self.name, " off")
 
 class BootInstrument():
     def __init__(self,sys,name):

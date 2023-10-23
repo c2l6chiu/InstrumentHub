@@ -41,17 +41,31 @@ for name in pre_instrument_list:
     t_instServer.start()
 
 
-while True:
+while sys.status:
     request = jobs.get()
-    # print(request)
-
     peices = request.split(' ')
+    commend = peices[0].lower()
+    if len(peices) > 1: arg = peices[1:]
 
-    if peices[0] == 'port':
+    if commend in ['application?' , "application" , "app" , "app?"]:
         print(sys.port_inst_app)
-    if peices[0] == 'instrument?':
+    if commend in ['instrument?' , "instrument" , "inst" , "inst?"]:
         print(sys.port_InstServer)
-    elif peices[0] == 'instrument':
+        print(sys.Inst_status)
+
+    if commend in ['connection?' , "connection" , "conn" , "conn?"]:
+        print(sys.port_inst_app)
+
+    if commend in ['exit',"quit","stop","exit()" ]:
+        sys.status = False  #this will shut down AppServer, shell
+        inst = []
+        for ser in sys.InstServer_thread_pool:
+            inst.append(ser)
+        for ser in inst:
+            sys.kill_InstServ(ser)
+
+
+
         #launch instrument with all the address,authkey
         #create a InstrumentCoordinator and run it
         pass

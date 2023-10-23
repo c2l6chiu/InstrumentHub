@@ -5,10 +5,10 @@ class Inst():
 
     def bark(self):
         if self.status:
-            print('bark')
+            # print('bark')
             return "bark"
         else:
-            print('zzz')
+            # print('zzz')
             return "zzz"
     
     def sleep(self):

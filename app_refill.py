@@ -1,4 +1,4 @@
-from Application import AppServer
+from ApplicationKernel import AppServer
 import time
 import datetime
 

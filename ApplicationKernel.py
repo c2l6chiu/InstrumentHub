@@ -42,10 +42,8 @@ class Coordinator():
     def __init__(self,link_address,authkey):
         self.port_app_inst= Client(link_address, authkey=authkey)
     
-    # def __del__(self):
-    #     self.port_app_inst.send("kill")
-    #     answer = self.port_app_inst.recv()
-    #     self.port_app_inst.close()
+    def __del__(self):
+        self.port_app_inst.close()
 
     def set(self,question):
         pass
