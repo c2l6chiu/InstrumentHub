@@ -1,10 +1,11 @@
 from multiprocessing.connection import Listener,Client
+import subprocess
 
 class System():
     version = "1.0"
     status = True
-    n_port_inst_app = 50
-    n_port_InstServer = 20
+    n_port_inst_app = 100
+    n_port_InstServer = 50
 
     #AppServer
     address_AppServer = '127.0.0.1'
@@ -19,14 +20,18 @@ class System():
     queue_InstServer = dict() #for app server to talk to (key: instrument value: Queue)
     InstServer_thread_pool = dict() #coordinator thread (key: instrument value: thread)
     
-    
-    #Instrument
+    #Instrument booting
+    address_boot = '127.0.0.1'
+    port_boot = 5724
+    authkey_boot = b'vf@pnml2138'
+
+    #Instrument status
     Inst_status = dict()  #instrument status (key: instrument value: last respond time)
 
-    #instrument <-> App
+    #Instrument <-> App
     address_inst_app = '127.0.0.1'
-    port_Inst_app_available = list(range(8000,89000+n_port_InstServer))
-    port_inst_app = dict()  #store key: app_name+serial-instrumen_name, value: port
+    port_inst_app_available = list(range(8000,8000+n_port_InstServer))
+    port_inst_app = dict()  #store key: port, value: app_name+serial-instrumen_name
     authkey_inst_app = b'vf@pnml9876'
 
 
@@ -90,14 +95,15 @@ class AppServer():
                 elif pieces[1] == "close_app":  #coming from application's destructor
                     #release port
                     ports,insts = self.searchport([pieces[2] , pieces[3]])
-                    port_Inst_app_available += ports
-                    print("release ports:")
-                    print(ports)
+                    self.sys.port_inst_app_available += ports
                     #tell the instrumentServer
                     for i in range(len(ports)):
-                        message = ("close",port[i])
+                        message = ("close",ports[i])
                         self.sys.queue_InstServer[insts[i]].put(message)
                         print("release ports:",ports[i],"from instrument: ", insts[i])
+
+                    #let application know the address , port number, authkey
+                    client.send("bye")
 
             except EOFError:
                 client = port_AppServer.accept()
@@ -105,24 +111,23 @@ class AppServer():
     def searchport(self,name):
         ports = []
         insts = []
-        for port in self.port_inst_app:
-            value = self.port_inst_app[port]
-            pieces = value.split('-')
+        for port in self.sys.port_inst_app:
+            appName = self.sys.port_inst_app[port]
+            pieces = appName.split('-')
             app_name,serialN = (pieces[0] , pieces[1])
             if name[0] == app_name and name[1] == serialN:
                 ports.append(port)
                 insts.append(pieces[2])
-                del self.port_inst_app[port]
+        for port in ports:
+            del self.sys.port_inst_app[port]
 
         return (ports,insts)
 
 
     def createPort(self,name):
-        if name in self.port_inst_app:
-            print("application attemp to connect to same instrument")
-            raise
-        self.port_inst_app[name] = self.port_Inst_app_available.pop()
-        return self.port_inst_app[name]
+        port = self.sys.port_inst_app_available.pop()
+        self.sys.port_inst_app[port] = name
+        return port
 
     def checkInstrument(self,name):
         #maybe check if the instrument alive
@@ -148,8 +153,9 @@ class InstrumentServer():
         self.name = name
         self.port = Client((self.sys.address_InstServer,self.sys.port_InstServer[name]),
                                     authkey=self.sys.authkey_InstServer)
-        
+
     def __del__(self):
+        self.port.send(("kill",0))
         self.port.close()
 
     def server(self):
@@ -158,5 +164,25 @@ class InstrumentServer():
             self.port.send(request)
             self.port.recv()
 
+class BootInstrument():
+    def __init__(self,sys,name):
+        self.sys = sys
+        self.name = name
 
-
+    def boot(self):
+        boot = Listener((self.sys.address_boot,self.sys.port_boot),
+                 authkey= self.sys.authkey_boot)
+        subprocess.call('start Instrument.py', shell=True)
+        client = boot.accept()
+        #send instrument class
+        client.send(self.name)
+        #receive the address
+        msg = "address_InstServer = '" + str(self.sys.address_InstServer) + "'"
+        client.send(msg)
+        #receive the port number
+        msg = "port_InstServer = "+ str(self.sys.port_InstServer[self.name])
+        client.send(msg)
+        #receive the authkey
+        msg = "authkey_InstServer = " + str(self.sys.authkey_InstServer)
+        client.send(msg)
+        boot.close()

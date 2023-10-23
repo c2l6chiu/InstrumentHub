@@ -1,6 +1,8 @@
 from threading import Thread
+from multiprocessing.connection import Listener
 from queue import Queue
-from Kernel import System,Shell,AppServer,InstrumentMom,InstrumentServer
+import subprocess
+from Kernel import System,Shell,AppServer,InstrumentMom,InstrumentServer,BootInstrument
 
 jobs = Queue()
 
@@ -22,35 +24,43 @@ instMom = InstrumentMom(sys)
 t_instMom = Thread(target=instMom.server,args=())
 t_instMom.start()
 
+#pre-launch Instrument
+pre_instrument_list = ['inst_dog',"inst_itc"]
 
-########## launch instrument ##########
-instrument_list = ['inst_dog.py']
-
-name = instrument_list[0]
-#laucn another interpreter
-
-
-sys.queue_InstServer[name] = Queue()
-sys.port_InstServer[name] = sys.port_InstServer_available.pop()
-#create InstrumentServer
-instServer = InstrumentServer(sys,name)
-
-#create/store thread
-t_instServer = Thread(target=instServer.server,args=())
-sys.InstServer_thread_pool[name] = t_instServer
-t_instServer.start()
+for name in pre_instrument_list:
+    sys.queue_InstServer[name] = Queue()
+    sys.port_InstServer[name] = sys.port_InstServer_available.pop()
+    #laucn new interpreter
+    launch = BootInstrument(sys,name)
+    launch.boot()
+    instServer = InstrumentServer(sys,name)
+    sys.Inst_status[name] = True
+    #create/store thread
+    t_instServer = Thread(target=instServer.server,args=())
+    sys.InstServer_thread_pool[name] = t_instServer
+    t_instServer.start()
 
 
 while True:
     request = jobs.get()
-    print(request)
+    # print(request)
 
     peices = request.split(' ')
 
     if peices[0] == 'port':
         print(sys.port_inst_app)
-
+    if peices[0] == 'instrument?':
+        print(sys.port_InstServer)
     elif peices[0] == 'instrument':
         #launch instrument with all the address,authkey
         #create a InstrumentCoordinator and run it
         pass
+
+    
+    # elif peices[0] == "exit":
+    #     sys.status = False
+    #     t_app.terminate()
+    #     t_shell.terminate()
+    #     t_instMom.terminate()
+    #     t_instServer.terminate()
+        # break

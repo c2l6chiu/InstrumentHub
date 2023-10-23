@@ -2,15 +2,36 @@ from threading import Thread
 from multiprocessing.connection import Listener,Client
 from queue import Queue
 from InstrumentKernel import InstrumentServer, InstrumentController, ServiceLine
+import os
 
-
+#bootstraping the instrument
 ######################################
-#get this from kernel during the launch
-from inst_dog import Inst
-address_InstServer = '127.0.0.1'
-port_InstServer = 7788
-authkey_InstServer = b'vf@pnml5193'
-######################################
+# from XXXX import Inst
+# address_InstServer = '127.0.0.1'
+# port_InstServer = 7788
+# authkey_InstServer = b'vf@pnml5193'
+address_boot = '127.0.0.1'
+port_boot = 5724
+authkey_boot = b'vf@pnml2138'
+boot =  Client((address_boot,port_boot),authkey=authkey_boot)
+#receive the instrument class
+msg = boot.recv()
+exec("from " + msg + " import Inst")
+print(msg+'\n')
+#receive the address
+msg = boot.recv()
+exec(msg)
+print(msg)
+#receive the port number
+msg = boot.recv()
+exec(msg)
+print(msg)
+#receive the authkey
+msg = boot.recv()
+print(msg)
+exec(msg)
+boot.close()
+# ######################################
 
 thread_pool = dict()
 que_respond = dict()
@@ -18,9 +39,7 @@ que_respond = dict()
 queue_serviceLine = Queue()
 que_command = Queue()
 
-
-#bootstraping the instrument
-#run the coordinator
+#run the instrument server
 instServer = InstrumentServer(queue_serviceLine)
 t_instServer = Thread(target=instServer.server, args=((address_InstServer,port_InstServer),
                        authkey_InstServer))
@@ -60,6 +79,7 @@ while True:
 
     elif commend == "kill":
         print("kill this instrument")
+        eval("a='")
     #implement the shut down here
     #stop controller
     #stop all the serviceLine

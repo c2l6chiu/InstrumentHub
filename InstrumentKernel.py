@@ -1,4 +1,3 @@
-
 from threading import Thread
 from multiprocessing.connection import Listener,Client
 from queue import Queue
@@ -35,7 +34,7 @@ class InstrumentController():
     def run(self):
         while True:
             port ,commend = self.queue_commend.get()
-            self.queue_respond[port].put(eval("self.inst."+commend))
+            self.queue_respond[port].put(eval("self.inst."+commend))    #exec()
 
 
 

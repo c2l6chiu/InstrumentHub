@@ -8,8 +8,8 @@ class AppServer():
     app_name = 'default'
     serial_number = str(random.randrange(1,10000))
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self,name):
+        self.app_name = name
 
     def __del__(self):
         message = "app_request-close_app"
@@ -40,7 +40,6 @@ class AppServer():
 
 class Coordinator():
     def __init__(self,link_address,authkey):
-        # print(link_address)
         self.port_app_inst= Client(link_address, authkey=authkey)
     
     # def __del__(self):
