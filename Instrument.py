@@ -2,6 +2,7 @@ from threading import Thread
 from multiprocessing.connection import Listener,Client
 from queue import Queue
 from InstrumentKernel import InstrumentServer, InstrumentController, ServiceLine
+import time
 
 #bootstraping the instrument
 ######################################
@@ -14,22 +15,23 @@ port_boot = 55724
 authkey_boot = b'vf@pnml2138'
 boot =  Client((address_boot,port_boot),authkey=authkey_boot)
 #receive the instrument class
-msg = boot.recv()
-exec("from " + msg + " import Inst")
-print(msg+'\n')
+msg_inst = boot.recv()
 #receive the address
-msg = boot.recv()
-exec(msg)
-print(msg)
+msg_add = boot.recv()
 #receive the port number
-msg = boot.recv()
-exec(msg)
-print(msg)
+msg_port = boot.recv()
 #receive the authkey
-msg = boot.recv()
-print(msg)
-exec(msg)
+msg_auth = boot.recv()
 boot.close()
+
+exec("from " + msg_inst + " import Inst")
+print(msg_inst+'\n')
+exec(msg_add)
+print(msg_add)
+exec(msg_port)
+print(msg_port)
+exec(msg_auth)
+print(msg_auth)
 # ######################################
 #Service lines 
 ser_pool = dict()

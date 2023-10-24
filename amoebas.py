@@ -3,6 +3,7 @@ from multiprocessing.connection import Listener
 from queue import Queue
 import subprocess
 from Kernel import System,Shell,AppServer,InstrumentMom,InstrumentServer,BootInstrument
+import time
 
 jobs = Queue()
 
@@ -25,7 +26,9 @@ t_instMom = Thread(target=instMom.server,args=())
 t_instMom.start()
 
 #pre-launch Instrument
-pre_instrument_list = ['inst_dog',"inst_itc"]#,"inst_nanonis"]
+# pre_instrument_list = ['inst_dog',"inst_itc"]
+pre_instrument_list = ['inst_dog',"inst_itc","inst_nanonis"]
+# pre_instrument_list = ["inst_nanonis"]
 
 for name in pre_instrument_list:
     sys.queue_InstServer[name] = Queue()

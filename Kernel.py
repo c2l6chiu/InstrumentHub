@@ -195,8 +195,6 @@ class InstrumentServer():
     def __init__(self,sys,name):
         self.sys = sys
         self.name = name
-        self.port = Client((self.sys.address_InstServer,self.sys.port_InstServer[name]),
-                                    authkey=self.sys.authkey_InstServer)
 
     def __del__(self):
         # self.port.send(("kill",0))
@@ -204,6 +202,8 @@ class InstrumentServer():
         self.port.close()
 
     def server(self):
+        self.port = Client((self.sys.address_InstServer,self.sys.port_InstServer[self.name]),
+                            authkey=self.sys.authkey_InstServer)
         while self.sys.status:
             request = self.sys.queue_InstServer[self.name].get()
             # print("goaway2")
