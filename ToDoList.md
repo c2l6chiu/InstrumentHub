@@ -4,6 +4,8 @@ in application.AppServer
 reduce recv() to avoid dead end
 
 
+deal with corrupted application
+    try to recover the corrupted instrument
 
 
 in application.AppServer.askPort
@@ -14,6 +16,7 @@ in application.Coordinator.ask:
 
 in application.Coordinator.query:
     handle time out error
+
 
 
 
