@@ -3,7 +3,7 @@ import random
     
 class AppServer():
     address_AppServer = '127.0.0.1'
-    port_AppServer = 5723
+    port_AppServer = 55723
     authkey_AppServer = b'vf@pnml1234'
     app_name = 'default'
     serial_number = str(random.randrange(1,10000))

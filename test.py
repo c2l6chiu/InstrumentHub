@@ -1,17 +1,27 @@
-import matplotlib.pyplot as plt
-import numpy as np
+# import matplotlib.pyplot as plt
+# import numpy as np
 
-x = np.linspace(0, 6*np.pi, 100)
-y = np.sin(x)
+# x = np.linspace(0, 6*np.pi, 100)
+# y = np.sin(x)
 
-# You probably won't need this if you're embedding things in a tkinter plot...
-plt.ion()
+# # You probably won't need this if you're embedding things in a tkinter plot...
+# plt.ion()
 
-fig = plt.figure()
-ax = fig.add_subplot(111)
-line1, = ax.plot(x, y, 'r-') # Returns a tuple of line objects, thus the comma
+# fig = plt.figure()
+# ax = fig.add_subplot(111)
+# line1, = ax.plot(x, y, 'r-') # Returns a tuple of line objects, thus the comma
 
-for phase in np.linspace(0, 10*np.pi, 500):
-    line1.set_ydata(np.sin(x + phase))
-    fig.canvas.draw()
-    fig.canvas.flush_events()
+# for phase in np.linspace(0, 10*np.pi, 500):
+#     line1.set_ydata(np.sin(x + phase))
+#     fig.canvas.draw()
+#     fig.canvas.flush_events()
+
+import socket
+
+address = "127.0.0.1"
+port = 1754
+client = socket.socket(socket.AF_INET , socket.SOCK_DGRAM)
+# sock.bind((self.address,self.port))
+client.connect( (address , port) )
+print(client.recv(100))
+client.send(b"abc")

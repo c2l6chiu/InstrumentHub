@@ -10,7 +10,7 @@ from InstrumentKernel import InstrumentServer, InstrumentController, ServiceLine
 # port_InstServer = 7788
 # authkey_InstServer = b'vf@pnml5193'
 address_boot = '127.0.0.1'
-port_boot = 5724
+port_boot = 55724
 authkey_boot = b'vf@pnml2138'
 boot =  Client((address_boot,port_boot),authkey=authkey_boot)
 #receive the instrument class

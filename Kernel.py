@@ -9,12 +9,12 @@ class System():
 
     #AppServer
     address_AppServer = '127.0.0.1'
-    port_AppServer = 5723
+    port_AppServer = 55723
     authkey_AppServer = b'vf@pnml1234'
 
     #InstrumentServer
     address_InstServer = '127.0.0.1'
-    port_InstServer_available = list(range(9000,9000+n_port_InstServer))
+    port_InstServer_available = list(range(59000,59000+n_port_InstServer))
     port_InstServer = dict() #store key: instrument, value: port
     authkey_InstServer = b'vf@pnml5193'
     queue_InstServer = dict() #for app server to talk to (key: instrument value: Queue)
@@ -22,7 +22,7 @@ class System():
     
     #Instrument booting
     address_boot = '127.0.0.1'
-    port_boot = 5724
+    port_boot = 55724
     authkey_boot = b'vf@pnml2138'
 
     #Instrument status
@@ -30,7 +30,7 @@ class System():
 
     #Instrument <-> App
     address_inst_app = '127.0.0.1'
-    port_inst_app_available = list(range(8000,8000+n_port_InstServer))
+    port_inst_app_available = list(range(58000,58000+n_port_InstServer))
     port_inst_app = dict()  #store key: port, value: app_name+serial-instrumen_name
     authkey_inst_app = b'vf@pnml9876'
 
