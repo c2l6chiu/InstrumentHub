@@ -58,25 +58,32 @@ while sys.status:
     commend = peices[0].lower()
     if len(peices) > 1: arg = peices[1:]
 
-    if commend in ['application?' , "application" , "app" , "app?"]:
+    elif commend in ['application?' , "application" , "app" , "app?"]:
         print(sys.port_inst_app)
 
-    if commend in ['instrument?' , "instrument" , "inst" , "inst?"]:
+    elif commend in ['instrument?' , "instrument" , "inst" , "inst?"]:
         print(sys.port_InstServer)
         print(sys.Inst_status)
 
-    if commend in ['connection?' , "connection" , "conn" , "conn?"]:
+    elif commend in ['connection?' , "connection" , "conn" , "conn?"]:
         print(sys.port_inst_app)
 
-    if commend in ["boot","start","launch"]:
+    elif commend in ["add","boot","start","launch","connect"]:
         boot = BootInstrument(sys,peices[1])
         boot.boot()
         del boot
-        
-    if commend in ["remove"]:
+
+    elif commend in ["remove"]:
         sys.kill_InstServ_and_Inst(peices[1])
 
-    if commend in ['exit',"quit","stop","exit()" ]:
+    elif commend in ["restart","reboot"]:
+        sys.kill_InstServ_and_Inst(peices[1])
+        time.sleep(1)
+        boot = BootInstrument(sys,peices[1])
+        boot.boot()
+        del boot
+
+    elif commend in ['exit',"quit","stop","exit()" ]:
         sys.status = False  #this will shut down AppServer, shell
         inst = []
         for ser in sys.InstServer_thread_pool:
@@ -84,17 +91,5 @@ while sys.status:
         for ser in inst:
             sys.kill_InstServ_and_Inst(ser)
 
-
-
-        #launch instrument with all the address,authkey
-        #create a InstrumentCoordinator and run it
-        pass
-
-    
-    # elif peices[0] == "exit":
-    #     sys.status = False
-    #     t_app.terminate()
-    #     t_shell.terminate()
-    #     t_instMom.terminate()
-    #     t_instServer.terminate()
-        # break
+    else:
+        print("commend not found")

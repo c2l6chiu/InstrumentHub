@@ -7,7 +7,7 @@ reduce recv() to avoid dead end
 deal with corrupted application
     try to recover the corrupted instrument
 
-i luv u :3
+
 in application.AppServer.askPort
     handle timeout
 

@@ -41,13 +41,19 @@ class System():
     def __init__(self):
         pass
 
+    # def __del__(self):
+        # self.status = False  #this will shut down AppServer, shell
+        # inst = []
+        # for ser in self.InstServer_thread_pool:
+        #     inst.append(ser)
+        # for ser in inst:
+        #     self.kill_InstServ_and_Inst(ser)
+
     def kill_InstServ_and_Inst(self,name):
         self.queue_InstServer[name].put(("kill",0))
-        print("goaway")
         port = self.port_InstServer[name]
         del self.port_InstServer[name]
         self.port_InstServer_available.append(port)
-
 
 class Shell():
     def __init__(self,jobs,sys):
@@ -200,7 +206,6 @@ class InstrumentServer():
 
     def __del__(self):
         # self.port.send(("kill",0))
-        # print("goaway4")
         self.port.close()
 
     def server(self):
@@ -208,11 +213,9 @@ class InstrumentServer():
                             authkey=self.sys.authkey_InstServer)
         while self.sys.status:
             request = self.sys.queue_InstServer[self.name].get()
-            # print("goaway2")
             # if request == ("kill",0): break
             self.port.send(request)
             self.port.recv()
-            # print("goaway3")
             if request == ("kill",0): break
         print("InstrumentServer: ",self.name, " off")
 
