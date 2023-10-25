@@ -31,22 +31,25 @@ pre_instrument_list = ['inst_dog',"inst_itc","inst_nanonis"]
 # pre_instrument_list = ["inst_nanonis"]
 
 for name in pre_instrument_list:
-    sys.queue_InstServer[name] = Queue()
-    sys.port_InstServer[name] = sys.port_InstServer_available.pop()
-    #laucn new interpreter
-    launch = BootInstrument(sys,name)
-    status = launch.boot()
-    if status == "failed":
-        del sys.queue_InstServer[name]
-        sys.port_InstServer_available.append(sys.port_InstServer[name])
-        del sys.port_InstServer[name]
-    else:
-        instServer = InstrumentServer(sys,name)
-        sys.Inst_status[name] = True
-        #create/store thread
-        t_instServer = Thread(target=instServer.server,args=())
-        sys.InstServer_thread_pool[name] = t_instServer
-        t_instServer.start()
+    boot = BootInstrument(sys,name)
+    boot.boot()
+    del boot
+    # sys.queue_InstServer[name] = Queue()
+    # sys.port_InstServer[name] = sys.port_InstServer_available.pop()
+    # #laucn new interpreter
+    # launch = BootInstrument(sys,name)
+    # status = launch.boot()
+    # if status == "failed":
+    #     del sys.queue_InstServer[name]
+    #     sys.port_InstServer_available.append(sys.port_InstServer[name])
+    #     del sys.port_InstServer[name]
+    # else:
+    #     instServer = InstrumentServer(sys,name)
+    #     sys.Inst_status[name] = True
+    #     #create/store thread
+    #     t_instServer = Thread(target=instServer.server,args=())
+    #     sys.InstServer_thread_pool[name] = t_instServer
+    #     t_instServer.start()
 
 
 while sys.status:
@@ -66,7 +69,12 @@ while sys.status:
         print(sys.port_inst_app)
 
     if commend in ["boot","start","launch"]:
-        pass
+        boot = BootInstrument(sys,peices[1])
+        boot.boot()
+        del boot
+        
+    if commend in ["remove"]:
+        sys.kill_InstServ_and_Inst(peices[1])
 
     if commend in ['exit',"quit","stop","exit()" ]:
         sys.status = False  #this will shut down AppServer, shell
@@ -74,7 +82,7 @@ while sys.status:
         for ser in sys.InstServer_thread_pool:
             inst.append(ser)
         for ser in inst:
-            sys.kill_InstServ(ser)
+            sys.kill_InstServ_and_Inst(ser)
 
 
 

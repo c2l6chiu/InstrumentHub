@@ -1,5 +1,7 @@
 from multiprocessing.connection import Listener,Client
+from threading import Thread
 import subprocess
+from queue import Queue
 
 class System():
     version = "1.0"
@@ -39,7 +41,7 @@ class System():
     def __init__(self):
         pass
 
-    def kill_InstServ(self,name):
+    def kill_InstServ_and_Inst(self,name):
         self.queue_InstServer[name].put(("kill",0))
         print("goaway")
         port = self.port_InstServer[name]
@@ -220,6 +222,23 @@ class BootInstrument():
         self.name = name
 
     def boot(self):
+        self.sys.queue_InstServer[self.name] = Queue()
+        self.sys.port_InstServer[self.name] = self.sys.port_InstServer_available.pop()
+        #laucn new interpreter
+        status = self.communicate()
+        if status == "failed":
+            del self.sys.queue_InstServer[self.name]
+            self.sys.port_InstServer_available.append(self.sys.port_InstServer[self.name])
+            del self.sys.port_InstServer[self.name]
+        else:
+            instServer = InstrumentServer(self.sys,self.name)
+            self.sys.Inst_status[self.name] = True
+            #create/store thread
+            t_instServer = Thread(target=instServer.server,args=())
+            self.sys.InstServer_thread_pool[self.name] = t_instServer
+            t_instServer.start()        
+    
+    def communicate(self):
         boot = Listener((self.sys.address_boot,self.sys.port_boot),
                  authkey= self.sys.authkey_boot)
         subprocess.call('start Instrument.py', shell=True)
