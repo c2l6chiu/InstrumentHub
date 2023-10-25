@@ -45,8 +45,12 @@ class InstrumentController():
         while True:
             port ,commend = self.queue_commend.get()
             if port == -1 and commend == "stop": break
-            self.queue_respond[port].put(eval("self.inst."+commend))    #exec()
-
+            try:
+                self.queue_respond[port].put(eval("self.inst."+commend))    #exec()
+            except Exception as eer:
+                self.queue_respond[port].put("error!@#")
+                print(eer)
+                print("error commend: "+commend)
 
 
 class InstrumentServer():

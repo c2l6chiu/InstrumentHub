@@ -58,6 +58,11 @@ class Coordinator():
         #working on the timeout issue
         self.port_app_inst.send(question)
         answer = self.port_app_inst.recv()
+        if answer == "error!@#":
+            print("*******************")
+            print("error commend: "+ question)
+            print("*******************")
+            raise
         return answer
     
 

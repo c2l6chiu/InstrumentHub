@@ -4,8 +4,9 @@ from ApplicationKernel import AppServer
 app = AppServer("app_test")
 nanonis = app.addInstrument('inst_nanonis')
 
-# print(nanonis.query("zctrl_io('on')"))
+print(nanonis.query("zctrl_io('on')e"))
 # print(nanonis.query("zctrl_io('off')"))
+# print(nanonis.query("zctrl_io('withdraw')"))
 # print(nanonis.query("zctrl_io_q()"))
 # print(nanonis.query("zctrl_z_set('12')"))
 # print(nanonis.query("zctrl_z_q()"))

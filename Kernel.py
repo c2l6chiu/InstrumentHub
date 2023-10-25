@@ -235,4 +235,10 @@ class BootInstrument():
         #receive the authkey
         msg = "authkey_InstServer = " + str(self.sys.authkey_InstServer)
         client.send(msg)
+        status = client.recv()
+        if status == "success":
+            print("booted successfully: "+self.name)
+        else:
+            print("fail booting: "+self.name)
         boot.close()
+        return status

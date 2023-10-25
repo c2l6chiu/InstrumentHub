@@ -5,7 +5,12 @@ class Inst():
         self.address = '127.0.0.1'
         self.port = 51758
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect( (self.address , self.port) )
+        try:
+            self.s.connect( (self.address , self.port) )
+        except Exception as eer:
+            print("failed to connect")
+            print(eer)
+            raise
 
     def __del__(self):
         self.s.close()

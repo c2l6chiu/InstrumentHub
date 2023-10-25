@@ -22,7 +22,6 @@ msg_add = boot.recv()
 msg_port = boot.recv()
 #receive the authkey
 msg_auth = boot.recv()
-boot.close()
 
 exec("from " + msg_inst + " import Inst")
 print(msg_inst+'\n')
@@ -32,25 +31,35 @@ exec(msg_port)
 print(msg_port)
 exec(msg_auth)
 print(msg_auth)
+#load instrument
+try:
+    instrument = Inst()
+    boot.send("success")
+    boot.close()
+except Exception as eer:
+    boot.send("failed")
+    print(eer)
+    boot.close()
+    exec("exit()")
 # ######################################
-#Service lines 
+
+#for Service lines 
 ser_pool = dict()
 que_respond = dict()
+que_command = Queue()
 
 #run the instrument server
 queue_InstServer = Queue()
 instServer = InstrumentServer(queue_InstServer)
 t_instServer = Thread(target=instServer.server, args=((address_InstServer,port_InstServer),
-                       authkey_InstServer))
+                    authkey_InstServer))
 t_instServer.start()
 
-
 #run the instrument controller
-que_command = Queue()
-instrument = Inst()
 controller = InstrumentController(instrument,que_command,que_respond)
 t_controller = Thread(target=controller.run, args=())
 t_controller.start()
+
 
 #maintaining the serviceLine
 while True:

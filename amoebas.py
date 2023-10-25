@@ -35,13 +35,18 @@ for name in pre_instrument_list:
     sys.port_InstServer[name] = sys.port_InstServer_available.pop()
     #laucn new interpreter
     launch = BootInstrument(sys,name)
-    launch.boot()
-    instServer = InstrumentServer(sys,name)
-    sys.Inst_status[name] = True
-    #create/store thread
-    t_instServer = Thread(target=instServer.server,args=())
-    sys.InstServer_thread_pool[name] = t_instServer
-    t_instServer.start()
+    status = launch.boot()
+    if status == "failed":
+        del sys.queue_InstServer[name]
+        sys.port_InstServer_available.append(sys.port_InstServer[name])
+        del sys.port_InstServer[name]
+    else:
+        instServer = InstrumentServer(sys,name)
+        sys.Inst_status[name] = True
+        #create/store thread
+        t_instServer = Thread(target=instServer.server,args=())
+        sys.InstServer_thread_pool[name] = t_instServer
+        t_instServer.start()
 
 
 while sys.status:
@@ -52,12 +57,16 @@ while sys.status:
 
     if commend in ['application?' , "application" , "app" , "app?"]:
         print(sys.port_inst_app)
+
     if commend in ['instrument?' , "instrument" , "inst" , "inst?"]:
         print(sys.port_InstServer)
         print(sys.Inst_status)
 
     if commend in ['connection?' , "connection" , "conn" , "conn?"]:
         print(sys.port_inst_app)
+
+    if commend in ["boot","start","launch"]:
+        pass
 
     if commend in ['exit',"quit","stop","exit()" ]:
         sys.status = False  #this will shut down AppServer, shell
