@@ -4,23 +4,23 @@ import time
 
 app = AppServer("app_test")
 nanonis = app.addInstrument('inst_nanonis')
-nanonisUDP = app.addInstrument('inst_nanonisUDP')
+# nanonisUDP = app.addInstrument('inst_nanonisUDP')
 
-t = time.time()*1000
-(nanonisUDP.query("get_all()"))
-print(time.time()*1000-t)
+# t = time.time()*1000
+# (nanonisUDP.query("get_all()"))
+# print(time.time()*1000-t)
 
-(nanonisUDP.query("get_all()"))
-print(time.time()*1000-t)
+# (nanonisUDP.query("get_all()"))
+# print(time.time()*1000-t)
 
-(nanonisUDP.query("get_all()"))
-print(time.time()*1000-t)
+# (nanonisUDP.query("get_all()"))
+# print(time.time()*1000-t)
 
-(nanonisUDP.query("get_all()"))
-print(time.time()*1000-t)
+# (nanonisUDP.query("get_all()"))
+# print(time.time()*1000-t)
 
-print(nanonis.query("zctrl_io('on')"))
-print(nanonis.query("zctrl_io('off')"))
+# print(nanonis.query("zctrl_io('on')"))
+# print(nanonis.query("zctrl_io('off')"))
 # print(nanonis.query("zctrl_io('withdraw')"))
 # print(nanonis.query("zctrl_io_q()"))
 # print(nanonis.query("zctrl_z_set('12')"))
@@ -42,7 +42,19 @@ print(nanonis.query("zctrl_io('off')"))
 # print(nanonis.query("bias_spec_sweep_q()"))
 # print(nanonis.query("bias_spec_channel('0,1,4')"))
 
+# print(nanonis.query("current()"))
 
+# print(nanonis.query("walker_setting('123','321')"))
+# print(nanonis.query("walker_setting_q()"))
+# print(nanonis.query("walker_walk('z-','500')"))
+# print(nanonis.query("walker_uni_walk('x-','500')"))
+# print(nanonis.query("walker_stop()"))
+
+# print(nanonis.query("move_move('13','-321')"))
+# print(nanonis.query("move_stop()"))
+# print(nanonis.query("move_q()"))
+# print(nanonis.query("move_speed('13')"))
+# print(nanonis.query("move_speed_q()"))
 
 
 

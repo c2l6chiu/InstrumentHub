@@ -87,28 +87,60 @@
 ###############  Current  ##############
 ########################################
 
+#query current, 1 data (nA)
+    def current(self):
 
-
+# print(nanonis.query("current()"))
 
 ########################################
 ###############  Walker  ###############
 ########################################
 
+#set walker voltage(V) freuqency(mS)
+    def walker_setting(self,volt,freq):
 
+#query walker voltage(V) freuqency(mS)
+    def walker_setting_q(self):
 
+#walk bipolar (will NOT hold until finish walking)
+    def walker_walk(self,dir,step):
 
+#walk unipolar z (will NOT hold until finish walking)
+    def walker_uni_walk(self,dir,step):
 
+#walker stop immediately
+    def walker_stop(self):
 
+# print(nanonis.query("walker_setting('123','321')"))
+# print(nanonis.query("walker_setting_q()"))
+# print(nanonis.query("walker_walk('z-','500')"))
+# print(nanonis.query("walker_uni_walk('x-','500')"))
+# print(nanonis.query("walker_stop()"))
 
 ########################################
-##########  Move/Drift/Tilt  ###########
+###########  Move/Position  ############
 ########################################
 
+#move to x,y (nm)
+    def move_move(self,x,y):
 
+#stop follow me now!
+    def move_stop(self):
 
+#query current x,y (nm)
+    def move_q(self):
 
+#set moving/scanning speed (nm/s)
+    def move_speed(self,speed):      
 
+#querry moving/scanning speed (nm/s)
+    def move_speed_q(self,speed):
 
+# print(nanonis.query("move_move('123','321')"))
+# print(nanonis.query("move_stop()"))
+# print(nanonis.query("move_q()"))
+# print(nanonis.query("move_speed('123')"))
+# print(nanonis.query("move_speed_q()"))
 
 ########################################
 ################  Scan  ################

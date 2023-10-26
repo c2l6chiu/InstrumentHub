@@ -1,4 +1,4 @@
-Finish read current / Walker / Move
+Finish UDP / figure out temperature update figure / plot the scanning
 
 Finish Scan/Grid/LockIn
 

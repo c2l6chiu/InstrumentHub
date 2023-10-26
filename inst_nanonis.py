@@ -166,6 +166,125 @@ class Inst():
 ###############  Current  ##############
 ########################################
 
+#query current (nA)
+    def current(self):
+        self.send("current")
+        message = self.recv()
+        return message      
+
+########################################
+###############  Walker  ###############
+########################################
+
+#set walker voltage(V) freuqency(mS)
+    def walker_setting(self,volt,freq):
+        volt_value , i_freq = (float(volt),float(freq))
+        if volt_value>390 or volt_value<10 or i_freq<10 or i_freq>400: return "wrong walker setting" 
+        self.send("walker_setting,"+volt+","+freq)
+        status = self.recv()
+        return status
+
+#query walker voltage(V) freuqency(mS)
+    def walker_setting_q(self):
+        self.send("walker_setting_q")
+        status = self.recv()
+        return status
+    
+#walk bipolar (will NOT hold until finish walking)
+    def walker_walk(self,dir,step):
+        dir = dir.lower()
+        dir_dict = ["+x","x+","-x","x-","+y","y+","-y","y-","+z","z+","-z","z-"]
+        step_value = int(step)
+        if dir not in dir_dict: return "error direction"
+        dir_ind = (dir_dict.index(dir))//2+1
+        if abs(step_value)>1001: return "too many steps"
+        self.send("walker_walk,"+str(dir_ind)+','+step)
+        status = self.recv()
+        return status   
+
+#walk unipolar z (will NOT hold until finish walking)
+    def walker_uni_walk(self,dir,step):
+        dir = dir.lower()
+        dir_dict = ["+x","x+","-x","x-","+y","y+","-y","y-","+z","z+","-z","z-"]
+        step_value = int(step)
+        if dir not in dir_dict: return "error direction"
+        if dir not in dir_dict[8:12]: return "only allow uni- in z"
+        dir_ind = (dir_dict.index(dir))//2+1
+        if abs(step_value)>1001: return "too many steps"
+        self.send("walker_uni_walk,"+str(dir_ind)+','+step)
+        status = self.recv()
+        return status
+
+#walker stop immediately
+    def walker_stop(self):
+        self.send("walker_stop")
+        status = self.recv()
+        return status
+       
+########################################
+###########  Move/Position  ############
+########################################
+
+#move to x,y (nm) (using scanning speed, set by move_speed)
+#!!!Watch out the tip speed setting!!! 
+#Suggest using move_speed to set speed up before using it
+    def move_move(self,x,y):
+        x_value , y_value = (float(x),float(y))
+        if max(abs(x_value) , abs(y_value)) > 1000: return "wrong position" 
+        self.send("move_move,"+x+","+y)
+        status = self.recv()
+        return status
+
+#stop follow me now!
+    def move_stop(self):
+        self.send("move_stop")
+        status = self.recv()
+        return status       
+
+#query current x,y (nm)
+    def move_q(self):
+        self.send("move_q")
+        setpoint = self.recv()
+        return setpoint
+    
+#set moving/scanning speed (nm/s)
+    def move_speed(self,speed):
+        speed_value = float(speed)
+        if speed_value <=0.1 or speed_value > 5000: return "wrong speed"
+        self.send("move_speed,"+speed)
+        status = self.recv()
+        return status          
+
+#querry moving/scanning speed (nm/s)
+    def move_speed_q(self):
+        self.send("move_speed_q")
+        setpoint = self.recv()
+        return setpoint
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def recv(self):
         return(self.s.recv(1024))
