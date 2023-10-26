@@ -1,11 +1,16 @@
-in application.AppServer
-    make sure that I don't need to close the connection to allow other connection
+Finish read current / Walker / Move
 
-reduce recv() to avoid dead end
+Finish Scan/Grid/LockIn
+
+Finish Ardrino /  RS232 / Keithley
+
+Merge two Labview file
 
 
-deal with corrupted application
-    try to recover the corrupted instrument
+
+Application crash:
+    did the destructor being called correctely?
+    if the communication stuck, how to close the connection?
 
 
 in application.AppServer.askPort
@@ -13,11 +18,6 @@ in application.AppServer.askPort
 
 in application.Coordinator.ask:
     clear buffer
-
-in application.Coordinator.query:
-    handle time out error
-
-
 
 
 
@@ -28,6 +28,7 @@ Instrumentation:
 
 In kernel AppServer.checkInstrument
     check if instrument is still alive by handshaking
+
 
 In Kernel deal with bad application connection
     1. attemp to connect to same instrument twice

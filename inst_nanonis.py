@@ -15,8 +15,8 @@ class Inst():
     def __del__(self):
         self.s.close()
 
-    def handShake(self):
-        pass
+    def echo(self,msg):
+        return(msg)
         # self.send("test")
         # return self.s.recv(1024)
 
