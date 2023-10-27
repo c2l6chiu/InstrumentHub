@@ -12,11 +12,22 @@ class Inst():
             print(eer)
             raise
 
+    def flush(self):
+        self.s.settimeout(0.001)
+        self.t0=0
+        while True:
+            try:
+                # data , addr = self.s.recvfrom(65535)
+                self.t0 = self.get_time()
+            except:
+                self.s.settimeout(0.1)
+                return self.t0
 #time(mS)
     def get_time(self):
         str = self.get_all()
         data = str.split(",")
-        return data[0]
+        time = data[0]
+        return float(time[2:])
 
 #Current (A)    
     def get_current(self):
@@ -72,6 +83,5 @@ class Inst():
         return data[21]
 
     def get_all(self):
-        data , addr = self.s.recvfrom(1024)
-        print("good")
-        return(data)
+        data , addr = self.s.recvfrom(256)
+        return(str(data))

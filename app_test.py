@@ -1,10 +1,42 @@
 from ApplicationKernel import AppServer
 import time
-
+import matplotlib.pyplot as plt
 
 app = AppServer("app_test")
-nanonis = app.addInstrument('inst_nanonis')
-# nanonisUDP = app.addInstrument('inst_nanonisUDP')
+# nanonis = app.addInstrument('inst_nanonis')
+nanonisUDP = app.addInstrument('inst_nanonisUDP')
+
+# t0 = nanonisUDP.query("flush()")
+# # print(t0)
+# t1 = nanonisUDP.query("get_time()")
+# c1 = nanonisUDP.query("get_current()")
+# print(t1-t0)
+
+# c2 = nanonisUDP.query("get_current()")
+# t2 = nanonisUDP.query("get_time()")
+# print(t2-t1)
+# print(float(c2)-float(c1))
+# print( nanonisUDP.query("get_all()"))
+
+
+t0=time.time()
+t = []
+nanonisUDP.query("flush()")
+for i in range(100):
+    tmp =float( str(nanonisUDP.query("get_time()")))
+    t.append(tmp-t0)
+    t0 = tmp
+print(t)
+
+
+
+# plt.ion()
+# fig = plt.figure()
+# ax = fig.add_subplot()
+# ax.plot(t, 'r-')
+# fig.show()
+
+
 
 # t = time.time()*1000
 # (nanonisUDP.query("get_all()"))
@@ -61,8 +93,8 @@ nanonis = app.addInstrument('inst_nanonis')
 # print(nanonis.query("lockin_io('off')")) 
 # print(nanonis.query("lockin_setting('2.2','2500','-48.447')"))
 # print(nanonis.query("lockin_setting_q()")) 
-print(nanonis.query("lockin_channel('8','3')"))
-print(nanonis.query("lockin_channel_q()")) 
+# print(nanonis.query("lockin_channel('8','3')"))
+# print(nanonis.query("lockin_channel_q()")) 
 
 
 

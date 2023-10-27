@@ -21,7 +21,7 @@ plt.ion()
 
 
 fig = plt.figure()
-ax = fig.add_subplot(111)
+ax = fig.add_subplot()
 
 line1, = ax.plot(x, y, 'r-') # Returns a tuple of line objects, thus the comma
 

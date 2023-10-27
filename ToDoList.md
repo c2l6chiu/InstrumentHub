@@ -5,7 +5,6 @@ Finish Ardrino /  RS232 / Keithley
 Finish Scan/Grid
 
 
-
 Application crash:
     did the destructor being called correctely?
     if the communication stuck, how to close the connection?
