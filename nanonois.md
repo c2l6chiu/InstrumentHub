@@ -1,4 +1,13 @@
 ########################################
+############  read_channel  ############
+########################################
+#read channel: 0: current,.... 22: labview time
+    def read_channel(self,list):
+        self.send("read")
+
+# print(nanonis.query("read_channel('0,22')"))
+
+########################################
 ############  Z controller  ############
 ########################################
 #switch on/off z controller or withdraw

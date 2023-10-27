@@ -3,30 +3,50 @@ import time
 import matplotlib.pyplot as plt
 
 app = AppServer("app_test")
-# nanonis = app.addInstrument('inst_nanonis')
+nanonis = app.addInstrument('inst_nanonis')
 nanonisUDP = app.addInstrument('inst_nanonisUDP')
 
-# t0 = nanonisUDP.query("flush()")
-# # print(t0)
-# t1 = nanonisUDP.query("get_time()")
-# c1 = nanonisUDP.query("get_current()")
-# print(t1-t0)
-
-# c2 = nanonisUDP.query("get_current()")
-# t2 = nanonisUDP.query("get_time()")
-# print(t2-t1)
-# print(float(c2)-float(c1))
-# print( nanonisUDP.query("get_all()"))
+t0 = nanonisUDP.query("flush()")
+result = nanonisUDP.query("get_channel('0,22')")
+c1 = result[0]
+t1 = result[1]
+result = nanonisUDP.query("get_channel('0,22')")
+c2 = result[0]
+t2 = result[1]
+print(c2 == c1)
+print(t2-t1)
 
 
-t0=time.time()
-t = []
-nanonisUDP.query("flush()")
-for i in range(100):
-    tmp =float( str(nanonisUDP.query("get_time()")))
-    t.append(tmp-t0)
-    t0 = tmp
-print(t)
+
+
+result = nanonis.query("read_channel('0,22')")
+c1 = result[0]
+t1 = result[1]
+result=nanonis.query("read_channel('0,22')")
+c2 = result[0]
+t2 = result[1]
+print(c2 == c1)
+print(t2-t1)
+
+
+# t0=0
+# c0 = 0
+# t = []
+# c = []
+# nanonisUDP.query("flush()")
+# for i in range(1000):
+#     result = nanonisUDP.query("get_channel('0,22')")
+#     c1 = result[0]
+#     t1 = result[1]
+#     t.append(t1-t0)
+#     c.append((c1-c0*10**14)//1)
+#     if c[-1]==0:
+#         print(t[-1])
+#         print("zero")
+#     t0 = t1
+#     c0 = c1
+# print(t)
+# print(c)
 
 
 

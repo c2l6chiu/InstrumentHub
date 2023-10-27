@@ -22,66 +22,80 @@ class Inst():
             except:
                 self.s.settimeout(0.1)
                 return self.t0
+
+    def get_channel(self,list):
+        result=[]
+        str = self.get_all()
+        data = str.split(",")
+        list = list.split(",")
+        for c in list:
+            if int(c)==0: data[int(c)] = data[int(c)][2:]
+            if int(c)==22: data[int(c)] = data[int(c)][:-1]
+            if int(c)==21: data[int(c)] = data[int(c)][:-4]
+            result+=[float(data[int(c)])]
+        return result
+
 #time(mS)
     def get_time(self):
         str = self.get_all()
         data = str.split(",")
-        time = data[0]
-        return float(time[2:])
-
+        pre = data[22]
+        return float(pre[:-1])
+    
 #Current (A)    
     def get_current(self):
         str = self.get_all()
         data = str.split(",")
-        return data[1]
+        pre = data[0]
+        return float(pre[2:])
 
 #LockIn X (V)    
     def get_lockin_2x(self):
         str = self.get_all()
         data = str.split(",")
-        return data[2]
+        return data[1]
 
 #LockIn Y (m)    
     def get_lockin_y(self):
         str = self.get_all()
         data = str.split(",")
-        return data[3]
+        return data[2]
 
 #LockIn 2X (m)    
     def get_lockin_2x(self):
         str = self.get_all()
         data = str.split(",")
-        return data[5]
+        return data[4]
 
 #LockIn 2Y (m)    
     def get_lockin_2y(self):
         str = self.get_all()
         data = str.split(",")
-        return data[6]
+        return data[5]
 #X (m)    
     def get_x(self):
         str = self.get_all()
         data = str.split(",")
-        return data[13]
+        return data[12]
     
 #Y (m)    
     def get_y(self):
         str = self.get_all()
         data = str.split(",")
-        return data[14]
+        return data[13]
 
 #Z (m)    
     def get_z(self):
         str = self.get_all()
         data = str.split(",")
-        return data[15]
+        return data[14]
         
 #X LockIn (m)    
     def get_x_lockin(self):
         str = self.get_all()
         data = str.split(",")
-        return data[21]
+        return data[20]
 
     def get_all(self):
-        data , addr = self.s.recvfrom(256)
+        data , addr = self.s.recvfrom(512)
         return(str(data))

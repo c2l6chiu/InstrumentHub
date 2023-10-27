@@ -21,6 +21,23 @@ class Inst():
         # return self.s.recv(1024)
 
 ########################################
+############  read_channel  ############
+########################################
+#read channel: 0: current,.... 22: labview time
+    def read_channel(self,list):
+        self.send("read")
+        result=[]
+        msg = str(self.recv())
+        data = msg.split(",")
+        list = list.split(",")
+        for c in list:
+            if int(c)==0: data[int(c)] = data[int(c)][2:]
+            if int(c)==22: data[int(c)] = data[int(c)][:-1]
+            if int(c)==21: data[int(c)] = data[int(c)][:-4]
+            result+=[float(data[int(c)])]
+        return result
+
+########################################
 ############  Z controller  ############
 ########################################
 #switch on/off z controller or withdraw
