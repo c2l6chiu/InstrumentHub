@@ -57,6 +57,13 @@ nanonis = app.addInstrument('inst_nanonis')
 # print(nanonis.query("move_speed_q()"))
 
 
+# print(nanonis.query("lockin_io('on')")) 
+# print(nanonis.query("lockin_io('off')")) 
+# print(nanonis.query("lockin_setting('2.2','2500','-48.447')"))
+# print(nanonis.query("lockin_setting_q()")) 
+print(nanonis.query("lockin_channel('8','3')"))
+print(nanonis.query("lockin_channel_q()")) 
+
 
 
 # import time

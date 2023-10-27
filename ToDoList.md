@@ -1,10 +1,8 @@
-Finish UDP / figure out temperature update figure / plot the scanning
-
-Finish Scan/Grid/LockIn
+Finish UDP / figure out temperature update figure / test ploting the scanning
 
 Finish Ardrino /  RS232 / Keithley
 
-Merge two Labview file
+Finish Scan/Grid
 
 
 

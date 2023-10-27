@@ -153,7 +153,29 @@
 ########################################
 
 
+########################################
+###############  Lockin  ###############
+########################################
 
-########################################
-###############  LockIn  ###############
-########################################
+#turn on/off the lock in 1:on 0: off
+    def lockin_io(self,arg):
+
+#set the setting: amplitude (V), frequency(Hz), phase(deg)
+    def lockin_setting(self,amp,frq,phs):
+
+#query the setting: amplitude (V), frequency(Hz), phase(deg)
+    def lockin_setting_q(self):
+
+#set the modulation/demodulation channel: mod, demod
+    def lockin_channel(self,mod,demod):
+
+#query the modulation/demodulation channel: mod, demod
+    def lockin_channel_q(self):
+
+# print(nanonis.query("lockin_io('on')")) 
+# print(nanonis.query("lockin_io('off')")) 
+# print(nanonis.query("lockin_setting('2.25','2501','-48.448')"))
+# print(nanonis.query("lockin_setting_q()")) 
+# print(nanonis.query("lockin_channel('0','1')"))
+# print(nanonis.query("lockin_channel_q()")) 
+

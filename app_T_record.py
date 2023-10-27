@@ -2,6 +2,8 @@ from ApplicationKernel import AppServer
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+from threading import Thread
+from queue import Queue
 
 
 app = AppServer("app_T_record")
@@ -26,7 +28,25 @@ line1, = ax.plot(x, y, 'r-') # Returns a tuple of line objects, thus the comma
 counter = 0
 d = 4
 
+que = Queue()
+
+
+class GetT:
+    def __init__(self,que) -> None:
+        self.que = que
+    def run(self):
+        while True:
+            self.que.put(float(itc.query("get_t1()")))
+            time.sleep(1)
+
+
+getT = GetT(que)
+t = Thread(target=getT.run)
+t.start()
+
 while True:
+    tmp = que.get()
+    print(tmp)
     counter+=d
     tmp = itc.query("get_t1()")
     if tmp !=0:
@@ -41,7 +61,6 @@ while True:
 
     fig.canvas.draw()
     fig.canvas.flush_events()
-    time.sleep(d)
 
 
 

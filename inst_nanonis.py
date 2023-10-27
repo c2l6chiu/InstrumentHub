@@ -261,23 +261,58 @@ class Inst():
         setpoint = self.recv()
         return setpoint
 
+########################################
+################  Scan  ################
+########################################
 
 
 
+########################################
+################  Grid  ################
+########################################
 
 
+########################################
+###############  Lockin  ###############
+########################################
+
+#turn on/off the lock in 1:on 0: off
+    def lockin_io(self,arg):
+        if arg in ["on"]: self.send("lockin_io,1")
+        elif arg in ["off"]: self.send("lockin_io,0")
+        else: return "error"
+        return self.recv()
+
+#set the setting: amplitude (V), frequency(Hz), phase(deg)
+    def lockin_setting(self,amp,frq,phs):
+        amp_value , frq_value , phs_value = (float(amp),float(frq),float(phs))
+        if amp_value>5 or amp_value<0: return "wrong amplitude" 
+        if frq_value<1 or frq_value>10000: return "wrong amplitude"
+        if phs_value<-360 or phs_value>360: return "wrong phase" 
+        self.send("lockin_setting,"+amp+","+frq+","+phs)
+        status = self.recv()
+        return status
+
+#query the setting: amplitude (V), frequency(Hz), phase(deg)
+    def lockin_setting_q(self):
+        self.send("lockin_setting_q")
+        message = self.recv()
+        return message    
 
 
+#set the modulation/demodulation channel: mod, demod
+    def lockin_channel(self,mod,demod):
+        mod_value , demod_value = (int(mod),int(demod))
+        if min(mod_value,demod_value)<0 or max(mod_value,demod_value)>23: return "wrong channel range" 
+        self.send("lockin_channel,"+mod+","+demod)
+        status = self.recv()
+        return status
 
-
-
-
-
-
-
-
-
-
+#query the modulation/demodulation channel: mod, demod
+    def lockin_channel_q(self):
+        self.send("lockin_channel_q")
+        message = self.recv()
+        return message    
 
 
 
