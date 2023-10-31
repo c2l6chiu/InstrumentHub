@@ -1,16 +1,5 @@
-import socket
+from ApplicationKernel import AppServer
 
-address = '127.0.0.1'
-port = 51795
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.bind( (address , port) )
-data , addr = s.recvfrom(65535)
-print(data)
-# data , addr = s.recvfrom(65535)
-# print(data)
-# data , addr = s.recvfrom(65535)
-# print(data)
-# data , addr = s.recvfrom(65535)
-# print(data)
-# data , addr = s.recvfrom(65535)
-# print(data)
+app = AppServer("app_figure_trackZ")
+nanonis = app.addInstrument('inst_nanonis')
+print(nanonis.query("read_channel('0,22')"))

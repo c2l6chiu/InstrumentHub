@@ -1,4 +1,8 @@
-Finish UDP / figure out temperature update figure / test ploting the scanning
+Figure out temperature: different serial
+
+update figure 
+
+test scanning
 
 Finish Ardrino /  RS232 / Keithley
 
@@ -18,9 +22,11 @@ in application.Coordinator.ask:
 
 
 
-Instrumentation:
-    need to deal with the proper way to shut down
-    =>tell the Kernel that instrument is gone before dying
+Instrument:
+    *need to be able to deal with failed launch instrument
+    *need to deal with the proper way to shut down =>tell the Kernel that instrument is gone before dying
+    *Need to be able to force kill the instrument server
+    
 
 
 In kernel AppServer.checkInstrument
@@ -31,3 +37,4 @@ In Kernel deal with bad application connection
     1. attemp to connect to same instrument twice
     2. application disappear
     3. application froze
+    4. need to be able to force delete the application if it got stuck

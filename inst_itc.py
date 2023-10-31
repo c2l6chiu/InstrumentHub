@@ -5,7 +5,8 @@ class Inst():
         self.ser = serial.Serial()
         self.ser.baudrate = 9600
         self.ser.port = 'COM4'
-        self.ser.timeout = 1
+        self.ser.timeout = 0.2
+        self.ser.close
         self.ser.open()
         self.remote()
 
@@ -17,9 +18,9 @@ class Inst():
         self.local()
 
     def get_t1(self):
-        self.remote()
+        # self.remote()
         self.ser.write(b'R1\r')
-        result =str(self.ser.read(1000),'utf-8')
+        result =str(self.ser.read(8),'utf-8')
         try:
             temperature = float(result.replace('R','').replace('\r', ''))
             
@@ -34,7 +35,7 @@ class Inst():
         string = 'G0{:3.1f}\r'.format(float(amount))
         self.remote()
         self.ser.write(bytes(string,'utf-8'))
-        self.ser.read(100)
+        self.ser.read(8)
 
     
 

@@ -15,8 +15,8 @@ class ServiceLine():
         self.status = True
     
     def __del__(self):
-        # self.port_inst_app.close()
-        pass
+        self.port_inst_app.close()
+        # pass
     
     def run(self):
         self.port_inst_app = Listener(self.address , authkey= self.authkey_serviceLine)

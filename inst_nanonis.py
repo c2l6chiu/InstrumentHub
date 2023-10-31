@@ -25,7 +25,7 @@ class Inst():
 ########################################
 #read channel: 0: current,.... 22: labview time
     def read_channel(self,list):
-        self.send("read")
+        self.send("read_channel")
         result=[]
         msg = str(self.recv())
         data = msg.split(",")
@@ -281,6 +281,51 @@ class Inst():
 ########################################
 ################  Scan  ################
 ########################################
+
+#start scan (action 0:stop 1: start 2: pause 3: resume) (direction: up down)
+    def scan_io(self,action,direction):
+        pass
+
+#query scan status 0: False 1: True
+    def scan_io_q(self):
+        pass
+
+#receive last scanned data (always down scan:up to down) (direction: 0: foward 1: backward)
+    def scan_get(self,channel,direction):
+        pass
+
+#set scan method
+    def scan_method(self,conti,bouncy,autoSave,name,comment):
+        pass
+
+#query scan method
+    def scan_method_q(self):
+        pass
+
+#set scan resolution
+    def scan_res(self,channel,pixel,lines):
+        pass
+
+#query scan resolution
+    def scan_res_q(self):
+        pass
+
+#set scan position
+    def scan_pos(self,x,y,sizeX,sizeY,ang):
+        pass
+
+#query scan position
+    def scan_pos_q(self):
+        pass
+
+#set scan speed
+    def scan_speed_q(self,forward,backward):
+        pass
+
+#query scan speed
+    def scan_speed(self):
+        pass
+
 
 
 

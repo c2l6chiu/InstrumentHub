@@ -4,29 +4,29 @@ import matplotlib.pyplot as plt
 
 app = AppServer("app_test")
 nanonis = app.addInstrument('inst_nanonis')
-nanonisUDP = app.addInstrument('inst_nanonisUDP')
+# nanonisUDP = app.addInstrument('inst_nanonisUDP')
 
-t0 = nanonisUDP.query("flush()")
-result = nanonisUDP.query("get_channel('0,22')")
-c1 = result[0]
-t1 = result[1]
-result = nanonisUDP.query("get_channel('0,22')")
-c2 = result[0]
-t2 = result[1]
-print(c2 == c1)
-print(t2-t1)
-
-
+# t0 = nanonisUDP.query("flush()")
+# result = nanonisUDP.query("get_channel('0,22')")
+# c1 = result[0]
+# t1 = result[1]
+# result = nanonisUDP.query("get_channel('0,22')")
+# c2 = result[0]
+# t2 = result[1]
+# print(c2 == c1)
+# print(t2-t1)
 
 
-result = nanonis.query("read_channel('0,22')")
-c1 = result[0]
-t1 = result[1]
-result=nanonis.query("read_channel('0,22')")
-c2 = result[0]
-t2 = result[1]
-print(c2 == c1)
-print(t2-t1)
+
+
+# result = nanonis.query("read_channel('0,22')")
+# c1 = result[0]
+# t1 = result[1]
+# result=nanonis.query("read_channel('0,22')")
+# c2 = result[0]
+# t2 = result[1]
+# print(c2 == c1)
+# print(t2-t1)
 
 
 # t0=0
@@ -50,26 +50,7 @@ print(t2-t1)
 
 
 
-# plt.ion()
-# fig = plt.figure()
-# ax = fig.add_subplot()
-# ax.plot(t, 'r-')
-# fig.show()
 
-
-
-# t = time.time()*1000
-# (nanonisUDP.query("get_all()"))
-# print(time.time()*1000-t)
-
-# (nanonisUDP.query("get_all()"))
-# print(time.time()*1000-t)
-
-# (nanonisUDP.query("get_all()"))
-# print(time.time()*1000-t)
-
-# (nanonisUDP.query("get_all()"))
-# print(time.time()*1000-t)
 
 # print(nanonis.query("zctrl_io('on')"))
 # print(nanonis.query("zctrl_io('off')"))
