@@ -367,9 +367,45 @@ class Inst():
 
 
 ########################################
-################  Grid  ################
+#############  Grid/Line  ##############
 ########################################
 
+#switch on/off/pause grid 0: stop 1: start 2: pause 3: resume
+    def grid_io(self,arg):
+        if arg in ["stop",'0']: self.send("grid_io,0")
+        elif arg in ["start",'1']: self.send("grid_io,1")
+        elif arg in ["pause","2"]: self.send("grid_io,2")
+        elif arg in ["resume","3"]: self.send("grid_io,3")
+        else: return "error"
+        return self.recv()
+
+#query grid/line status
+    def grid_io_q(self):
+        self.send("grid_io_q")
+        status = self.recv()
+        return status
+
+#set grid setting (nm)
+    def grid_setting(self,centerX,centerY,width,height,angle,pointX,pointY):
+        self.send("grid_setting,"+centerX+","+centerY+","+width+","+height+","+angle+","+pointX+","+pointY)
+        return self.recv()
+
+#query grid setting (no implementation in labview)
+    def grid_setting_q(self):
+        self.send("grid_setting_q")
+        status = self.recv()
+        return status        
+
+#set line setting (nm)
+    def line_setting(self,startX,startY,endX,endY,point):
+        self.send("grid_setting,"+startX+","+startY+","+endX+","+endY+","+point)
+        return self.recv()
+
+#query line setting (no implementation in labview)
+    def line_setting_q(self):
+        self.send("line_setting_q")
+        status = self.recv()
+        return status    
 
 ########################################
 ###############  Lockin  ###############
@@ -412,11 +448,6 @@ class Inst():
         self.send("lockin_channel_q")
         message = self.recv()
         return message    
-
-
-
-
-
 
 
 
