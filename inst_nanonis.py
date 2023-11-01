@@ -40,7 +40,7 @@ class Inst():
 ########################################
 ############  Z controller  ############
 ########################################
-#switch on/off z controller or withdraw
+#switch on/off z controller or withdraw (on:1 off: 0)
     def zctrl_io(self,arg):
         if arg in ["on"]: self.send("zctrl_io,1")
         elif arg in ["off"]: self.send("zctrl_io,2")
@@ -282,51 +282,88 @@ class Inst():
 ################  Scan  ################
 ########################################
 
-#start scan (action 0:stop 1: start 2: pause 3: resume) (direction: up down)
+#start scan (action 0:stop 1: start 2: pause 3: resume) (direction 0:up scan 1:down scan)
     def scan_io(self,action,direction):
-        pass
+        if action in ["start","1"]: action = "1"
+        elif action == ["stop","0"]: action = "0"
+        elif action == ["pause","2"]: action = "2"
+        elif action == ["resume","3"]: action = "3"
+        else: return "error action"
+        if direction in ["up","0"]: direction = "0"
+        elif direction == ["down","1"]: direction = "1"
+        else: return "error directoin"     
+        self.send("scan_io,"+action+","+direction)
+        return self.recv()
 
 #query scan status 0: False 1: True
     def scan_io_q(self):
-        pass
+        self.send("scan_io_q")
+        status = self.recv()
+        return status
 
-#receive last scanned data (always down scan:up to down) (direction: 0: foward 1: backward)
+#receive last scanned data (channel: only one) (direction: 1: forward 2: backward) (always down scan:up to down)
     def scan_get(self,channel,direction):
-        pass
+        if not channel in [str(i) for i in range(24)]: return "error channel"
+        if direction in ["1","forward"]: direction="1"
+        elif direction in ["2","forward"]: direction="2"
+        else: return "error direction"
+        self.send("scan_get,"+channel+","+direction)
+        return self.recv()
 
-#set scan method
-    def scan_method(self,conti,bouncy,autoSave,name,comment):
-        pass
 
-#query scan method
+#set scan method (conti 1:on 0:off) (bouncy 1:on 0:off) (autoSave 1:on 0: off 2: next)
+    def scan_method(self,conti,bouncy,autoSave,name):
+        if conti in ["on","1"]: action = "1"
+        elif conti == ["off","0"]: action = "0"
+        else: return "wrong conti setting"
+        if bouncy in ["on","1"]: action = "1"
+        elif bouncy == ["off","0"]: action = "0"
+        else: "wrong bouncy setting"
+        if autoSave in ["on","1"]: action = "1"
+        elif autoSave == ["off","0"]: action = "0"
+        elif autoSave == ["next","2"]: action = "2"
+        else: "wrong autoSave setting"
+        self.send("scan_method,"+conti+","+bouncy+","+autoSave+","+name)
+        return self.recv()
+
+#query scan method (conti 1:on 0:off) (bouncy 1:on 0:off) file_name
     def scan_method_q(self):
-        pass
+        self.send("zctrl_io_q")
+        status = self.recv()
+        return status
 
-#set scan resolution
-    def scan_res(self,channel,pixel,lines):
-        pass
+#set scan resolution (#) (#) (channel: 0,1,14 I,dIdV,Z)
+    def scan_res(self,pixel,lines,channel):
+        self.send("scan_res,"+pixel+","+lines+","+channel)
+        return self.recv()
 
-#query scan resolution
+#query scan resolution (pixel,lines,channel,channel,...,channel)
     def scan_res_q(self):
-        pass
+        self.send("scan_res_q")
+        status = self.recv()
+        return status
 
-#set scan position
+#set scan position x(nm),y(nm),sizeX(nm),sizeY(nm), angle(deg)
     def scan_pos(self,x,y,sizeX,sizeY,ang):
-        pass
+        self.send("scan_pos,"+x+","+y+","+sizeX+","+sizeY+","+ang)
+        return self.recv()
 
-#query scan position
+#query scan position x(nm),y(nm),sizeX(nm),sizeY(nm), angle(deg)
     def scan_pos_q(self):
-        pass
+        self.send("scan_pos_q")
+        status = self.recv()
+        return status
 
-#set scan speed
+#set scan speed speed (forward: nm/s backward: nm/s)
     def scan_speed_q(self,forward,backward):
-        pass
+        self.send("scan_pos,"+forward+","+backward)
+        return self.recv()
 
 #query scan speed
     def scan_speed(self):
-        pass
-
-
+        self.send("scan_pos_q")
+        status = self.recv()
+        return status
 
 
 ########################################
