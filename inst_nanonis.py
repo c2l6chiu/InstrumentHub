@@ -285,12 +285,12 @@ class Inst():
 #start scan (action 0:stop 1: start 2: pause 3: resume) (direction 0:up scan 1:down scan)
     def scan_io(self,action,direction):
         if action in ["start","1"]: action = "1"
-        elif action == ["stop","0"]: action = "0"
-        elif action == ["pause","2"]: action = "2"
-        elif action == ["resume","3"]: action = "3"
+        elif action in ["stop","0"]: action = "0"
+        elif action in ["pause","2"]: action = "2"
+        elif action in ["resume","3"]: action = "3"
         else: return "error action"
         if direction in ["up","0"]: direction = "0"
-        elif direction == ["down","1"]: direction = "1"
+        elif direction in ["down","1"]: direction = "1"
         else: return "error directoin"     
         self.send("scan_io,"+action+","+direction)
         return self.recv()
@@ -304,11 +304,11 @@ class Inst():
 #receive last scanned data (channel: only one) (direction: 1: forward 2: backward) (always down scan:up to down)
     def scan_get(self,channel,direction):
         if not channel in [str(i) for i in range(24)]: return "error channel"
-        if direction in ["1","forward"]: direction="1"
-        elif direction in ["2","forward"]: direction="2"
+        if direction in ["1","forward",1]: direction="1"
+        elif direction in ["2","forward",2]: direction="2"
         else: return "error direction"
         self.send("scan_get,"+channel+","+direction)
-        return self.recv()
+        return self.recv().decode('utf-8')
 
 
 #set scan method (conti 1:on 0:off) (bouncy 1:on 0:off) (autoSave 1:on 0: off 2: next)

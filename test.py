@@ -1,5 +1,21 @@
-from ApplicationKernel import AppServer
+# import pyvisa
 
-app = AppServer("app_figure_trackZ")
-nanonis = app.addInstrument('inst_nanonis')
-print(nanonis.query("read_channel('0,22')"))
+# rm = pyvisa.ResourceManager()
+# itc = rm.open_resource('GPIB0::24::INSTR')
+# itc.read_termination = '\r'
+# itc.timeout = 20
+# itc.baud_rate = 96400
+# print(rm.list_resources())
+
+# print(itc.query('G025.0'))
+# print(itc.query('R1'))
+
+# print(itc.query('R1'))
+# print(itc.read())
+# print(itc.read())
+# print(itc.read())
+# print(itc.read())
+# print(itc.read())
+# print(itc.read())
+# print(itc.read_bytes(8))
+

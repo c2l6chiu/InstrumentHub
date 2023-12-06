@@ -3,13 +3,13 @@ import time
 import datetime
 
 app = AppServer("app_T_record")
-itc = app.addInstrument('inst_itc')
+itc = app.addInstrument('inst_itcGPIB')
 
 
 
 percent = 0
 th_temperature = 1.52
-delay = 4
+delay = 2
 
 startTime = datetime.datetime.today()
 startTemperature = itc.query("get_t1()")

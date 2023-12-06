@@ -4,6 +4,17 @@ import matplotlib.pyplot as plt
 
 app = AppServer("app_test")
 nanonis = app.addInstrument('inst_nanonis')
+
+# print(nanonis.query("scan_io('3','1')"))
+# print(nanonis.query("scan_io_q()"))
+# print(nanonis.query("scan_get('0','2')"))
+a = str(nanonis.query("scan_get('14','2')"))
+b=a.split(',')
+print(b)
+print(len(b))
+
+
+
 # nanonisUDP = app.addInstrument('inst_nanonisUDP')
 
 # t0 = nanonisUDP.query("flush()")

@@ -155,7 +155,17 @@
 ################  Scan  ################
 ########################################
 
+#start scan (action 0:stop 1: start 2: pause 3: resume) (direction 0:up scan 1:down scan)
+    def scan_io(self,action,direction):
 
+#query scan status 0: False 1: True
+    def scan_io_q(self):
+
+#receive last scanned data (channel: only one) (direction: 1: forward 2: backward) (always down scan:up to down)
+    def scan_get(self,channel,direction):
+
+# print(nanonis.query("scan_io('3','1')"))
+# print(nanonis.query("scan_io_q()"))
 
 ########################################
 ################  Grid  ################

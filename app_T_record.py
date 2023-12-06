@@ -7,13 +7,13 @@ from queue import Queue
 
 
 app = AppServer("app_T_record")
-itc = app.addInstrument('inst_itc')
+itc = app.addInstrument('inst_itcGPIB')
 
 
 
 
-print(float(itc.query("get_t1()")))
-print(float(itc.query("get_t1()")))
+print(itc.query("get_t1()"))
+# print(float(itc.query("get_t1()")))
 
 # x = np.array([])
 # y = np.array([])

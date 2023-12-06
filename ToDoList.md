@@ -1,4 +1,9 @@
-Figure out temperature: different serial
+Make a 1Kpot/temperature application:
+    1. record temperature
+    2. record last filled up time
+    3. control 1K pot fill (full, %, time)
+
+Pre launch temperature recorder
 
 update figure 
 
@@ -6,7 +11,6 @@ test scanning
 
 Finish Ardrino /  RS232 / Keithley
 
-Finish Scan/Grid
 
 
 Application crash:

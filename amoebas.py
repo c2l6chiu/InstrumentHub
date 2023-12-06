@@ -27,8 +27,8 @@ t_instMom.start()
 
 #pre-launch Instrument
 # pre_instrument_list = ['inst_dog',"inst_itc"]
-pre_instrument_list = ['inst_dog',"inst_itc","inst_nanonis","inst_nanonisUDP" ]
-# pre_instrument_list = ["inst_nanonis"]
+# pre_instrument_list = ['inst_dog',"inst_itcGPIB","inst_nanonis","inst_nanonisUDP" ]
+pre_instrument_list = ["inst_nanonis"]
 
 for name in pre_instrument_list:
     boot = BootInstrument(sys,name)
@@ -76,12 +76,17 @@ while sys.status:
     elif commend in ["remove"]:
         sys.kill_InstServ_and_Inst(peices[1])
 
-    elif commend in ["restart","reboot"]:
-        sys.kill_InstServ_and_Inst(peices[1])
+    elif commend in ["restart","reboot","rrr"]:
+        #remove
+        inst_to_kill = list(sys.port_InstServer.keys())
+        for i in inst_to_kill[:]:
+            sys.kill_InstServ_and_Inst(i)
+        # restart
         time.sleep(1)
-        boot = BootInstrument(sys,peices[1])
-        boot.boot()
-        del boot
+        for name in pre_instrument_list:
+            boot = BootInstrument(sys,name)
+            boot.boot()
+            del boot        
 
     elif commend in ['exit',"quit","stop","exit()" ]:
         sys.status = False  #this will shut down AppServer, shell
