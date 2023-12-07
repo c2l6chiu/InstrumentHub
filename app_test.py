@@ -8,12 +8,15 @@ nanonis = app.addInstrument('inst_nanonis')
 # print(nanonis.query("scan_io('3','1')"))
 # print(nanonis.query("scan_io_q()"))
 # print(nanonis.query("scan_get('0','2')"))
-a = str(nanonis.query("scan_get('14','2')"))
-b=a.split(',')
-print(b)
-print(len(b))
-
-
+# a = nanonis.query("scan_get('0','2')")
+# print(nanonis.query("scan_method(1,0,0,'test')"))
+# print(nanonis.query("scan_method_q()"))
+# print(nanonis.query("scan_res(32,32,'[0,1,14]')"))
+# print(nanonis.query("scan_res_q()"))
+# print(nanonis.query("scan_pos(1.1,1.2,13,14,23)"))
+# print(nanonis.query("scan_pos_q()"))
+print(nanonis.query("scan_speed(5,4)"))
+print(nanonis.query("scan_speed_q()"))
 
 # nanonisUDP = app.addInstrument('inst_nanonisUDP')
 

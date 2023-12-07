@@ -164,8 +164,40 @@
 #receive last scanned data (channel: only one) (direction: 1: forward 2: backward) (always down scan:up to down)
     def scan_get(self,channel,direction):
 
+#set scan method (conti 1:on(change dir after scan) 0:off) (bouncy 1:on 0:off) (autoSave 1:on 0: off 2: next)
+    def scan_method(self,conti,bouncy,autoSave,name):
+
+#query scan method (conti 1:on 0:off) (bouncy 1: 0:off) file_name
+    def scan_method_q(self):
+
+#set scan resolution (#) (#) (channel: 0,1,14 I,dIdV,Z)
+    def scan_res(self,pixel,lines,channel):
+
+#query scan resolution (pixel,lines,channel,channel,...,channel)
+    def scan_res_q(self):
+
+#set scan position x(nm),y(nm),sizeX(nm),sizeY(nm), angle(deg)
+    def scan_pos(self,x,y,sizeX,sizeY,ang):
+
+#query scan position x(nm),y(nm),sizeX(nm),sizeY(nm), angle(deg)
+    def scan_pos_q(self):
+
+#set scan speed speed (forward: nm/s backward: nm/s)
+    def scan_speed(self,forward,backward):
+
+#query scan speed
+    def scan_speed_q(self):
+
 # print(nanonis.query("scan_io('3','1')"))
 # print(nanonis.query("scan_io_q()"))
+# a = nanonis.query("scan_get('0','2')")
+# print(nanonis.query("scan_method(1,0,0,'test')"))
+# print(nanonis.query("scan_method_q()"))
+# print(nanonis.query("scan_res(32,32,'[0,1,14]')"))
+# print(nanonis.query("scan_res_q()"))
+# print(nanonis.query("scan_pos(1.1,1.2,13,14,23)"))
+# print(nanonis.query("scan_pos_q()"))
+
 
 ########################################
 ################  Grid  ################

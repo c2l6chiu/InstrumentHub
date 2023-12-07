@@ -298,8 +298,7 @@ class Inst():
 #query scan status 0: False 1: True
     def scan_io_q(self):
         self.send("scan_io_q")
-        status = self.recv()
-        return status
+        return self.recv().decode('utf-8').split(',')
 
 #receive last scanned data (channel: only one) (direction: 1: forward 2: backward) (always down scan:up to down)
     def scan_get(self,channel,direction):
@@ -308,63 +307,64 @@ class Inst():
         elif direction in ["2","forward",2]: direction="2"
         else: return "error direction"
         self.send("scan_get,"+channel+","+direction)
-        return self.recv().decode('utf-8')
+        result = self.recv().decode('utf-8')
+        result = result[:-2].split(',')
+        result = list(map(float,result))
+        return result
 
 
-#set scan method (conti 1:on 0:off) (bouncy 1:on 0:off) (autoSave 1:on 0: off 2: next)
+#set scan method (conti 1:on 0:off) (bouncy 1:on(change dir after scan) 0:off) (autoSave 1:on 0: off 2: next)
     def scan_method(self,conti,bouncy,autoSave,name):
-        if conti in ["on","1"]: action = "1"
-        elif conti == ["off","0"]: action = "0"
+        if conti in ["on","1",1]: action_conti = "1"
+        elif conti in ["off","0",0]: action_conti = "0"
         else: return "wrong conti setting"
-        if bouncy in ["on","1"]: action = "1"
-        elif bouncy == ["off","0"]: action = "0"
+        if bouncy in ["on","1",1]: action_bouncy = "1"
+        elif bouncy in ["off","0",0]: action_bouncy = "0"
         else: "wrong bouncy setting"
-        if autoSave in ["on","1"]: action = "1"
-        elif autoSave == ["off","0"]: action = "0"
-        elif autoSave == ["next","2"]: action = "2"
+        if autoSave in ["on","1",1]: action_autoSave = "1"
+        elif autoSave in ["off","0",0]: action_autoSave = "0"
+        elif autoSave in ["next","2",2]: action_autoSave = "2"
         else: "wrong autoSave setting"
-        self.send("scan_method,"+conti+","+bouncy+","+autoSave+","+name)
+        self.send("scan_method,"+action_conti+","+action_bouncy+","+action_autoSave+","+name)
         return self.recv()
 
 #query scan method (conti 1:on 0:off) (bouncy 1:on 0:off) file_name
     def scan_method_q(self):
-        self.send("zctrl_io_q")
-        status = self.recv()
-        return status
+        self.send("scan_method_q")
+        return self.recv().decode('utf-8').split(',')
 
-#set scan resolution (#) (#) (channel: 0,1,14 I,dIdV,Z)
+#set scan resolution (#) (#) (channel: '[0,1,14]' I,dIdV,Z)
     def scan_res(self,pixel,lines,channel):
-        self.send("scan_res,"+pixel+","+lines+","+channel)
+        self.send("scan_res,"+str(pixel)+","+str(lines)+","+channel)
         return self.recv()
 
 #query scan resolution (pixel,lines,channel,channel,...,channel)
     def scan_res_q(self):
         self.send("scan_res_q")
-        status = self.recv()
-        return status
+        result = self.recv().decode('utf-8').split(',')
+        return list(map(int,result))
 
 #set scan position x(nm),y(nm),sizeX(nm),sizeY(nm), angle(deg)
     def scan_pos(self,x,y,sizeX,sizeY,ang):
-        self.send("scan_pos,"+x+","+y+","+sizeX+","+sizeY+","+ang)
+        self.send("scan_pos,"+str(x)+","+str(y)+","+str(sizeX)+","+str(sizeY)+","+str(ang))
         return self.recv()
 
 #query scan position x(nm),y(nm),sizeX(nm),sizeY(nm), angle(deg)
     def scan_pos_q(self):
         self.send("scan_pos_q")
-        status = self.recv()
-        return status
+        result = self.recv().decode('utf-8').split(',')
+        return list(map(float,result))
 
 #set scan speed speed (forward: nm/s backward: nm/s)
-    def scan_speed_q(self,forward,backward):
-        self.send("scan_pos,"+forward+","+backward)
+    def scan_speed(self,forward,backward):
+        self.send("scan_speed,"+str(forward)+","+str(backward))
         return self.recv()
 
 #query scan speed
-    def scan_speed(self):
-        self.send("scan_pos_q")
-        status = self.recv()
-        return status
-
+    def scan_speed_q(self):
+        self.send("scan_speed_q")
+        result = self.recv().decode('utf-8').split(',')
+        return list(map(float,result))
 
 ########################################
 #############  Grid/Line  ##############
@@ -452,7 +452,8 @@ class Inst():
 
 
     def recv(self):
-        return(self.s.recv(1024))
+        n_byte = int(self.s.recv(8))
+        return(self.s.recv(n_byte))
 
     def send(self,msg):
         n = len(msg)
