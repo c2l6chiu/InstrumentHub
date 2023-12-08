@@ -413,8 +413,8 @@ class Inst():
 
 #turn on/off the lock in 1:on 0: off
     def lockin_io(self,arg):
-        if arg in ["on"]: self.send("lockin_io,1")
-        elif arg in ["off"]: self.send("lockin_io,0")
+        if arg in ["on","1",1]: self.send("lockin_io,1")
+        elif arg in ["off","0",0]: self.send("lockin_io,0")
         else: return "error"
         return self.recv()
 
@@ -431,8 +431,8 @@ class Inst():
 #query the setting: amplitude (V), frequency(Hz), phase(deg)
     def lockin_setting_q(self):
         self.send("lockin_setting_q")
-        message = self.recv()
-        return message    
+        result = self.recv().decode('utf-8').split(',')
+        return list(map(float,result)) 
 
 
 #set the modulation/demodulation channel: mod, demod
@@ -450,6 +450,8 @@ class Inst():
         return message    
 
 
+
+########################################
 
     def recv(self):
         n_byte = int(self.s.recv(8))

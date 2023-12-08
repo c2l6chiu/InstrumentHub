@@ -15,8 +15,10 @@ nanonis = app.addInstrument('inst_nanonis')
 # print(nanonis.query("scan_res_q()"))
 # print(nanonis.query("scan_pos(1.1,1.2,13,14,23)"))
 # print(nanonis.query("scan_pos_q()"))
-print(nanonis.query("scan_speed(5,4)"))
-print(nanonis.query("scan_speed_q()"))
+# print(nanonis.query("scan_speed(5,4)"))
+# print(nanonis.query("scan_speed_q()"))
+
+print(nanonis.query("lockin_setting_q()")) 
 
 # nanonisUDP = app.addInstrument('inst_nanonisUDP')
 
