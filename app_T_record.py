@@ -12,7 +12,7 @@ itc = app.addInstrument('inst_itcGPIB')
 
 
 
-print(itc.query("get_t1()"))
+# print(itc.query("get_t1()"))
 # print(float(itc.query("get_t1()")))
 
 # x = np.array([])

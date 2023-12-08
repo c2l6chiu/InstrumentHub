@@ -42,3 +42,7 @@ In Kernel deal with bad application connection
     2. application disappear
     3. application froze
     4. need to be able to force delete the application if it got stuck
+
+
+
+ext install seanwu.vscode-qt-for-python
