@@ -13,8 +13,7 @@ from PySide6.QtWidgets import (QApplication , QWidget , QGridLayout ,
 from PySide6.QtCore import Signal , Qt 
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
-from matplotlib.backends.backend_qtagg import \
-    NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT
 from matplotlib.figure import Figure
 
 class Ui_Widget():
@@ -72,7 +71,7 @@ class Ui_Widget():
         #left top (temperature)
         self.LTLayout = QGridLayout()
         self.LTLayout.addWidget(self.canvas, 0, 0)
-        self.LTLayout.addWidget(NavigationToolbar(self.canvas, Widget), 1, 0)
+        self.LTLayout.addWidget(NavigationToolbar2QT(self.canvas, Widget), 1, 0)
         self.ax = self.canvas.figure.subplots()
         t = np.linspace(0, 10, 501)
         self.ax.plot(t, np.tan(t), ".")
