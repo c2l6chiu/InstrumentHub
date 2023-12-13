@@ -3,8 +3,9 @@ import time
 import datetime
 import numpy as np
 
-# from ApplicationKernel import AppServer
-# app = AppServer("app_T_record")
+from ApplicationKernel import AppServer
+app = AppServer("app_Tcontroll")
+itc = app.addInstrument("inst_itcSIM")
 # itc = app.addInstrument('inst_itcGPIB')
 
 from PySide6.QtGui import QPalette, QColor
@@ -33,12 +34,13 @@ class Ui_Widget():
         self.scrollArea_message.setWidget(self.lable_message)
 
         #control
-        self.lineEdit_ymax = QLineEdit("0")
+        self.lineEdit_ymax = QLineEdit("10")
         self.lineEdit_ymax.setMaximumWidth(80)
-        self.lineEdit_ymin = QLineEdit("10")
+        self.lineEdit_ymin = QLineEdit("0")
         self.lineEdit_ymin.setMaximumWidth(80)
-        self.button_autoScale = QPushButton("Auto Scale")
-        self.button_manualScale = QPushButton("Manual Scale")
+        self.checkBox_autoScale = QCheckBox("Auto Scale")
+        self.checkBox_autoScale.setChecked(True)
+        self.checkBox_manualScale = QCheckBox("Manual Scale")
         self.label_1K = QLabel("1K pot")
         self.label_SHD_TOP = QLabel("SHD TOP")
         self.label_MAG_TOP = QLabel("MAG TOP")
@@ -86,8 +88,8 @@ class Ui_Widget():
         self.LTLayout.addWidget(self.canvas, 0, 0)
         self.LTLayout.addWidget(NavigationToolbar2QT(self.canvas, Widget), 1, 0)
         self.ax = self.canvas.figure.subplots()
-        t = np.linspace(0, 10, 501)
-        self.ax.plot(t, np.tan(t), ".")
+        # t = np.linspace(0, 10, 501)
+        # self.ax.plot(t, np.tan(t), ".")
 
         #left bottom (message)
         self.LBLayout = QGridLayout()
@@ -96,10 +98,12 @@ class Ui_Widget():
 
         #right top (read control)
         self.RTLayout = QGridLayout()
-        self.RTLayout.addWidget(self.lineEdit_ymin, 0, 0)
-        self.RTLayout.addWidget(self.lineEdit_ymax, 1, 0)
-        self.RTLayout.addWidget(self.button_autoScale, 0, 2)
-        self.RTLayout.addWidget(self.button_manualScale, 1, 1)
+        self.RTLayout.addWidget(QLabel("T Max"), 0, 0)
+        self.RTLayout.addWidget(QLabel("T Min"), 1, 0)
+        self.RTLayout.addWidget(self.lineEdit_ymax, 0, 1)
+        self.RTLayout.addWidget(self.lineEdit_ymin, 1, 1)
+        self.RTLayout.addWidget(self.checkBox_autoScale, 0, 2)
+        self.RTLayout.addWidget(self.checkBox_manualScale, 1, 2)
         self.RTLayout.addWidget(QLabel(""), 2, 1)
         self.RTLayout.addWidget(QLabel("Temperature"), 3, 1)
         self.RTLayout.addWidget(QLabel("On/Off"), 3, 2)
@@ -155,8 +159,10 @@ class Ui_Widget():
         self.mainLayout.setRowStretch(0, 10)
 
     def connectUi(self, Widget):
-        self.button_autoScale.clicked.connect(Widget.autoScale)
-        self.button_manualScale.clicked.connect(Widget.manualScale)
+        self.lineEdit_ymax.textChanged.connect(Widget.change_yScale)
+        self.lineEdit_ymin.textChanged.connect(Widget.change_yScale)
+        self.checkBox_autoScale.stateChanged.connect(Widget.autoScale)
+        self.checkBox_manualScale.stateChanged.connect(Widget.manualScale)
         self.checkBox_1K.stateChanged.connect(Widget.state_1K)
         self.checkBox_SHD_TOP.stateChanged.connect(Widget.state_SHD_TOP)
         self.checkBox_MAG_TOP.stateChanged.connect(Widget.state_MAG_TOP)
@@ -182,6 +188,7 @@ class Widget(QWidget):
 
         self.ui.setupUi(self)
         self.ui.connectUi(self)
+        self.loadData()
         
         self.message=[]
         self.updateMessage("launch temperature control")
@@ -195,13 +202,35 @@ class Widget(QWidget):
         vbar = self.ui.scrollArea_message.verticalScrollBar()
         vbar.setValue(vbar.maximum())
 
+    def loadData(self):
+        n_days = self.ui.SpinBox_numberDay.value()
+        self.time = np.linspace(0,10,101)
+        self.T_1K = np.random.normal(1.2,0.02,101)
+        self.T_SHD_TOP = np.random.normal(1.2,0.02,101)
+        self.T_MAG_TOP = np.random.normal(2,0.0001,101)
+        self.T_MAG_BOT = np.random.normal(2,0.0001,101)
+
+    @Slot()
+    def change_yScale(self):
+        bottom , top = (float(self.ui.lineEdit_ymin.text()) , float(self.ui.lineEdit_ymax.text()))
+        self.ui.ax.set_ylim(bottom , top)
+        self.update()
+
     @Slot()
     def autoScale(self):
-        print("autoscale")
+        if self.ui.checkBox_autoScale.isChecked():
+            self.ui.checkBox_manualScale.setChecked(False)
+        else:
+            self.ui.checkBox_manualScale.setChecked(True)
+        self.update()
 
     @Slot()
     def manualScale(self):
-        print("manualScale")
+        if self.ui.checkBox_manualScale.isChecked():
+            self.ui.checkBox_autoScale.setChecked(False)
+        else:
+            self.ui.checkBox_autoScale.setChecked(True)
+        self.update()
 
     @Slot()
     def state_1K(self):
@@ -220,11 +249,33 @@ class Widget(QWidget):
 
     @Slot()
     def update(self):
-        print("update")
+        left , right = self.ui.ax.get_xlim()
+        bottom , top = self.ui.ax.get_ylim()
+
+        self.loadData()
+        self.ui.ax.clear()
+        
+        if self.ui.checkBox_1K.isChecked():
+            self.ui.ax.plot(self.time , self.T_1K)
+        if self.ui.checkBox_SHD_TOP.isChecked():
+            self.ui.ax.plot(self.time , self.T_SHD_TOP)
+        if self.ui.checkBox_MAG_TOP.isChecked():
+            self.ui.ax.plot(self.time , self.T_MAG_TOP)
+        if self.ui.checkBox_MAG_BOT.isChecked():
+            self.ui.ax.plot(self.time , self.T_MAG_BOT)
+
+        if self.ui.checkBox_manualScale.isChecked():
+            self.ui.ax.set_xlim(left , right)
+            self.ui.ax.set_ylim(bottom , top)
+        else:
+            self.ui.ax.autoscale()
+        self.ui.canvas.figure.canvas.draw()
 
     @Slot()
     def dayShown(self):
         print("showing",self.ui.SpinBox_numberDay.value())
+        # self.loadData()
+        # self.update()
 
     @Slot()
     def potSchedule(self):
