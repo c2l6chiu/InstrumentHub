@@ -9,7 +9,7 @@ import numpy as np
 from PySide6.QtGui import QPalette, QColor
 from PySide6.QtWidgets import (QApplication , QWidget , QGridLayout ,
                 QPushButton , QTimeEdit , QLineEdit , QSpinBox , QLabel,
-                QScrollArea)
+                QScrollArea , QLCDNumber , QCheckBox)
 from PySide6.QtCore import Signal , Qt 
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
@@ -33,7 +33,30 @@ class Ui_Widget():
         self.scrollArea_message.setWidget(self.lable_message)
 
         #control
-        self.buttonC = QPushButton("control")
+        self.lineEdit_ymax = QLineEdit("0")
+        self.lineEdit_ymin = QLineEdit("10")
+        self.button_autoScale = QPushButton("Auto Scale")
+        self.button_manualScale = QPushButton("Manual Scale")
+        self.label_1K = QLabel("1K pot")
+        self.label_SHD_TOP = QLabel("SHD TOP")
+        self.label_MAG_TOP = QLabel("MAG TOP")
+        self.label_MAG_BOT = QLabel("MAG BOT")
+        self.LCD_1K = QLabel("+0.00")
+        self.LCD_SHD_TOP = QLabel("+0.00")
+        self.LCD_MAG_TOP = QLabel("+0.00")
+        self.LCD_MAG_BOT = QLabel("+0.00")
+        self.Radio_1K = QCheckBox()
+        self.Radio_SHD_TOP = QCheckBox()
+        self.Radio_MAG_TOP = QCheckBox()
+        self.Radio_MAG_BOT = QCheckBox()
+        self.lable_1K = QLabel("+0.00")
+        self.lable_SHD_TOP = QLabel("+0.00")
+        self.lable_MAG_TOP = QLabel("+0.00")
+        self.lable_MAG_BOT = QLabel("+0.00")
+        self.lable_numberDay = QLabel("# Days")
+        self.SpinBox_numberDay = QSpinBox()
+        self.button_updateNow = QPushButton("Update Now")
+
 
         #For refill
         self.lable_status = QLabel("One")
@@ -54,7 +77,6 @@ class Ui_Widget():
         t = np.linspace(0, 10, 501)
         self.ax.plot(t, np.tan(t), ".")
 
-
         #left bottom (message)
         self.LBLayout = QGridLayout()
         self.LBLayout.addWidget(self.lineEdit_path, 0, 0)
@@ -62,7 +84,36 @@ class Ui_Widget():
 
         #right top (read control)
         self.RTLayout = QGridLayout()
-        self.RTLayout.addWidget(self.buttonC, 0, 0)
+        self.RTLayout.addWidget(self.lineEdit_ymin, 0, 0)
+        self.RTLayout.addWidget(self.lineEdit_ymax, 1, 0)
+        self.RTLayout.addWidget(self.button_autoScale, 0, 2)
+        self.RTLayout.addWidget(self.button_manualScale, 1, 1)
+        self.RTLayout.addWidget(QLabel(""), 2, 1)
+        self.RTLayout.addWidget(QLabel("Current Temperature"), 3, 1)
+        self.RTLayout.addWidget(QLabel("On/Off"), 3, 2)
+        self.RTLayout.addWidget(QLabel("rate of change"), 3, 3)
+        self.RTLayout.addWidget(self.label_1K, 4, 0)
+        self.RTLayout.addWidget(self.label_SHD_TOP, 5, 0)
+        self.RTLayout.addWidget(self.label_MAG_TOP, 6, 0)
+        self.RTLayout.addWidget(self.label_MAG_BOT, 7, 0)
+        self.RTLayout.addWidget(self.LCD_1K, 4, 1)
+        self.RTLayout.addWidget(self.LCD_SHD_TOP, 5, 1)
+        self.RTLayout.addWidget(self.LCD_MAG_TOP, 6, 1)
+        self.RTLayout.addWidget(self.LCD_MAG_BOT, 7, 1)
+        self.RTLayout.addWidget(self.Radio_1K, 4, 2)
+        self.RTLayout.addWidget(self.Radio_SHD_TOP, 5, 2)
+        self.RTLayout.addWidget(self.Radio_MAG_TOP, 6, 2)
+        self.RTLayout.addWidget(self.Radio_MAG_BOT, 7, 2)
+        self.RTLayout.addWidget(self.lable_1K, 4, 3)
+        self.RTLayout.addWidget(self.lable_SHD_TOP, 5, 3)
+        self.RTLayout.addWidget(self.lable_MAG_TOP, 6, 3)
+        self.RTLayout.addWidget(self.lable_MAG_BOT, 7, 3)
+        self.RTLayout.addWidget(QLabel(""), 8, 1)
+        self.RTLayout.addWidget(QLabel("Display"), 9, 1)
+        self.RTLayout.addWidget(self.lable_numberDay, 10, 0)
+        self.RTLayout.addWidget(self.SpinBox_numberDay, 10, 1)
+        self.RTLayout.addWidget(self.button_updateNow, 11, 1)
+
 
         #right bottom (refill 1K pot)
         self.RBLayout = QGridLayout()
