@@ -10,7 +10,7 @@ from PySide6.QtGui import QPalette, QColor
 from PySide6.QtWidgets import (QApplication , QWidget , QGridLayout ,
                 QPushButton , QTimeEdit , QLineEdit , QSpinBox , QLabel,
                 QScrollArea , QLCDNumber , QCheckBox)
-from PySide6.QtCore import Signal , Qt 
+from PySide6.QtCore import Signal , Slot , Qt 
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT
@@ -33,7 +33,9 @@ class Ui_Widget():
 
         #control
         self.lineEdit_ymax = QLineEdit("0")
+        self.lineEdit_ymax.setMaximumWidth(80)
         self.lineEdit_ymin = QLineEdit("10")
+        self.lineEdit_ymin.setMaximumWidth(80)
         self.button_autoScale = QPushButton("Auto Scale")
         self.button_manualScale = QPushButton("Manual Scale")
         self.label_1K = QLabel("1K pot")
@@ -44,26 +46,36 @@ class Ui_Widget():
         self.LCD_SHD_TOP = QLabel("+0.00")
         self.LCD_MAG_TOP = QLabel("+0.00")
         self.LCD_MAG_BOT = QLabel("+0.00")
-        self.Radio_1K = QCheckBox()
-        self.Radio_SHD_TOP = QCheckBox()
-        self.Radio_MAG_TOP = QCheckBox()
-        self.Radio_MAG_BOT = QCheckBox()
+        self.checkBox_1K = QCheckBox()
+        self.checkBox_1K.setChecked(True)
+        self.checkBox_SHD_TOP = QCheckBox()
+        self.checkBox_MAG_TOP = QCheckBox()
+        self.checkBox_MAG_BOT = QCheckBox()
         self.lable_1K = QLabel("+0.00")
         self.lable_SHD_TOP = QLabel("+0.00")
         self.lable_MAG_TOP = QLabel("+0.00")
         self.lable_MAG_BOT = QLabel("+0.00")
         self.lable_numberDay = QLabel("# Days")
         self.SpinBox_numberDay = QSpinBox()
-        self.button_updateNow = QPushButton("Update Now")
+        self.SpinBox_numberDay.setValue(1)
+        self.SpinBox_numberDay.setMinimum (1)
+        self.pushButton_Update = QPushButton("Update Now")
 
 
         #For refill
-        self.lable_status = QLabel("One")
+        self.CheckBox_schedule = QCheckBox("schedule")
+        self.CheckBox_repeat = QCheckBox("repeat?")
+        self.button_refill = QPushButton("refill now")
         self.timeEdit_schedule = QTimeEdit()
-        self.spinBox_openTo = QSpinBox()
-        self.button_autoClose = QPushButton("Auto close")
-        self.button_schedule = QPushButton("schedule")
-        self.button_openTo = QPushButton("open to")
+        self.timeEdit_schedule.setMaximumWidth(80)
+        self.lineEdit_openTo = QLineEdit("40")
+        self.lineEdit_openTo.setMaximumWidth(80)
+        self.lineEdit_threshold = QLineEdit("1.5")
+        self.lineEdit_threshold.setMaximumWidth(80)
+        self.button_setNV = QPushButton("set NV to:")
+        self.lineEdit_setTo = QLineEdit("40")
+        self.lineEdit_setTo.setMaximumWidth(80)
+        self.button_closeNV = QPushButton("close NV")
 
         #main layout
         self.mainLayout = QGridLayout(Widget)
@@ -88,9 +100,9 @@ class Ui_Widget():
         self.RTLayout.addWidget(self.button_autoScale, 0, 2)
         self.RTLayout.addWidget(self.button_manualScale, 1, 1)
         self.RTLayout.addWidget(QLabel(""), 2, 1)
-        self.RTLayout.addWidget(QLabel("Current Temperature"), 3, 1)
+        self.RTLayout.addWidget(QLabel("Temperature"), 3, 1)
         self.RTLayout.addWidget(QLabel("On/Off"), 3, 2)
-        self.RTLayout.addWidget(QLabel("rate of change"), 3, 3)
+        self.RTLayout.addWidget(QLabel("rate (K/min)"), 3, 3)
         self.RTLayout.addWidget(self.label_1K, 4, 0)
         self.RTLayout.addWidget(self.label_SHD_TOP, 5, 0)
         self.RTLayout.addWidget(self.label_MAG_TOP, 6, 0)
@@ -99,29 +111,36 @@ class Ui_Widget():
         self.RTLayout.addWidget(self.LCD_SHD_TOP, 5, 1)
         self.RTLayout.addWidget(self.LCD_MAG_TOP, 6, 1)
         self.RTLayout.addWidget(self.LCD_MAG_BOT, 7, 1)
-        self.RTLayout.addWidget(self.Radio_1K, 4, 2)
-        self.RTLayout.addWidget(self.Radio_SHD_TOP, 5, 2)
-        self.RTLayout.addWidget(self.Radio_MAG_TOP, 6, 2)
-        self.RTLayout.addWidget(self.Radio_MAG_BOT, 7, 2)
+        self.RTLayout.addWidget(self.checkBox_1K, 4, 2)
+        self.RTLayout.addWidget(self.checkBox_SHD_TOP, 5, 2)
+        self.RTLayout.addWidget(self.checkBox_MAG_TOP, 6, 2)
+        self.RTLayout.addWidget(self.checkBox_MAG_BOT, 7, 2)
         self.RTLayout.addWidget(self.lable_1K, 4, 3)
         self.RTLayout.addWidget(self.lable_SHD_TOP, 5, 3)
         self.RTLayout.addWidget(self.lable_MAG_TOP, 6, 3)
         self.RTLayout.addWidget(self.lable_MAG_BOT, 7, 3)
-        self.RTLayout.addWidget(QLabel(""), 8, 1)
-        self.RTLayout.addWidget(QLabel("Display"), 9, 1)
-        self.RTLayout.addWidget(self.lable_numberDay, 10, 0)
-        self.RTLayout.addWidget(self.SpinBox_numberDay, 10, 1)
-        self.RTLayout.addWidget(self.button_updateNow, 11, 1)
-
+        self.RTLayout.addWidget(self.pushButton_Update, 8, 1)
+        self.RTLayout.addWidget(QLabel(""), 9, 1)
+        self.RTLayout.addWidget(QLabel("Display"), 10, 1)
+        self.RTLayout.addWidget(self.lable_numberDay, 11, 0)
+        self.RTLayout.addWidget(self.SpinBox_numberDay, 11, 1)
+        
 
         #right bottom (refill 1K pot)
         self.RBLayout = QGridLayout()
-        self.RBLayout.addWidget(self.lable_status, 0, 0)
-        self.RBLayout.addWidget(self.timeEdit_schedule, 1, 0)
-        self.RBLayout.addWidget(self.spinBox_openTo, 2, 0)
-        self.RBLayout.addWidget(self.button_autoClose, 0, 1)
-        self.RBLayout.addWidget(self.button_schedule, 1, 1)
-        self.RBLayout.addWidget(self.button_openTo, 2, 1)
+        self.RBLayout.addWidget(self.CheckBox_schedule, 0, 0)
+        self.RBLayout.addWidget(self.CheckBox_repeat, 0, 1)
+        self.RBLayout.addWidget(self.button_refill, 0, 2)
+        self.RBLayout.addWidget(QLabel("time"), 1, 0)
+        self.RBLayout.addWidget(QLabel("open to"), 1, 1)
+        self.RBLayout.addWidget(QLabel("threshold"), 1, 2)
+        self.RBLayout.addWidget(self.timeEdit_schedule, 2, 0)
+        self.RBLayout.addWidget(self.lineEdit_openTo, 2, 1)
+        self.RBLayout.addWidget(self.lineEdit_threshold, 2, 2)
+        self.RBLayout.addWidget(QLabel("value"), 3, 1)
+        self.RBLayout.addWidget(self.button_setNV, 4, 0)
+        self.RBLayout.addWidget(self.lineEdit_setTo, 4, 1)
+        self.RBLayout.addWidget(self.button_closeNV, 4, 2)
 
 
         self.mainLayout.addLayout(self.LTLayout,0,0,3,5)
@@ -129,18 +148,89 @@ class Ui_Widget():
         self.mainLayout.addLayout(self.RTLayout,0,5)
         self.mainLayout.addLayout(self.RBLayout,3,5)
 
-
+    def connectUi(self, Widget):
+        self.button_autoScale.clicked.connect(Widget.autoScale)
+        self.button_manualScale.clicked.connect(Widget.manualScale)
+        self.checkBox_1K.stateChanged.connect(Widget.state_1K)
+        self.checkBox_SHD_TOP.stateChanged.connect(Widget.state_SHD_TOP)
+        self.checkBox_MAG_TOP.stateChanged.connect(Widget.state_MAG_TOP)
+        self.checkBox_MAG_BOT.stateChanged.connect(Widget.state_MAG_BOT)
+        self.pushButton_Update.clicked.connect(Widget.update)
+        self.SpinBox_numberDay.valueChanged.connect(Widget.dayShown)
+        self.CheckBox_schedule.stateChanged.connect(Widget.potSchedule)
+        self.CheckBox_repeat.stateChanged.connect(Widget.potRepeate)
+        self.button_refill.clicked.connect(Widget.refill)
+        self.button_setNV.clicked.connect(Widget.setNV)
+        self.button_closeNV.clicked.connect(Widget.closeNV)
 
         
 
-
+# def stateChanged (arg__1)
+# def checkState ()
 
 
 class Widget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.ui = Ui_Widget()
+
         self.ui.setupUi(self)
+        self.ui.connectUi(self)
+
+        
+
+    @Slot()
+    def autoScale(self):
+        print("autoscale")
+
+    @Slot()
+    def manualScale(self):
+        print("manualScale")
+
+    @Slot()
+    def state_1K(self):
+        print("1K state: ",self.ui.checkBox_1K.isChecked())
+
+    @Slot()
+    def state_SHD_TOP(self):
+        print("SHD_TOP state: ",self.ui.checkBox_SHD_TOP.isChecked())
+
+    @Slot()
+    def state_MAG_TOP(self):
+        print("MAG_TOP state: ",self.ui.checkBox_MAG_TOP.isChecked())
+    @Slot()
+    def state_MAG_BOT(self):
+        print("MAG_BOT state: ",self.ui.checkBox_MAG_BOT.isChecked())
+
+    @Slot()
+    def update(self):
+        print("update")
+
+    @Slot()
+    def dayShown(self):
+        print("showing",self.ui.SpinBox_numberDay.value())
+
+    @Slot()
+    def potSchedule(self):
+        print("pot scheduled",self.ui.CheckBox_schedule.isChecked())
+        print(self.ui.timeEdit_schedule.text() , " to: " , self.ui.lineEdit_openTo.text() , " threshold: " , self.ui.lineEdit_threshold.text())
+
+    @Slot()
+    def potRepeate(self):
+        print("pot scheduled",self.ui.CheckBox_repeat.isChecked())
+
+    @Slot()
+    def refill(self):
+        print("refill")
+
+    @Slot()
+    def setNV(self):
+        print("set NV to: " , self.ui.lineEdit_setTo.text())
+
+    @Slot()
+    def closeNV(self):
+        print("closeNV")
+
 
 def get_darkModePalette( app=None ) :
     darkPalette = app.palette()
