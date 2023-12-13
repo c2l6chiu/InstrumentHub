@@ -20,8 +20,6 @@ class Widget(QWidget):
         self.setupUi(self)
 
 
-
-
     def setupUi(self, Widget):
         if not Widget.objectName():
             Widget.setObjectName(u"Widget")
