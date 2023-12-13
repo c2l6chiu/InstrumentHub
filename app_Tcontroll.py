@@ -2,11 +2,12 @@ import sys
 import time
 import datetime
 import numpy as np
+import pandas as pd
 
-from ApplicationKernel import AppServer
-app = AppServer("app_Tcontroll")
-itc = app.addInstrument("inst_itcSIM")
-# itc = app.addInstrument('inst_itcGPIB')
+# from ApplicationKernel import AppServer
+# app = AppServer("app_Tcontroll")
+# itc = app.addInstrument("inst_itcSIM")
+# # itc = app.addInstrument('inst_itcGPIB')
 
 from PySide6.QtGui import QPalette, QColor
 from PySide6.QtWidgets import (QApplication , QWidget , QGridLayout ,
@@ -17,12 +18,13 @@ from PySide6.QtCore import Signal , Slot , Qt
 from matplotlib.backends.backend_qtagg import FigureCanvas
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT
 from matplotlib.figure import Figure
+import matplotlib.dates as mdates
 
 class Ui_Widget():
     def setupUi(self, Widget):
         Widget.setObjectName(u"Temperture control")
         Widget.setWindowTitle(Widget.objectName())
-        Widget.resize(1000, 500)
+        Widget.resize(1000, 600)
 
         #Plot
         self.canvas = FigureCanvas(Figure())
@@ -58,11 +60,14 @@ class Ui_Widget():
         self.lable_SHD_TOP = QLabel("+0.00")
         self.lable_MAG_TOP = QLabel("+0.00")
         self.lable_MAG_BOT = QLabel("+0.00")
-        self.lable_numberDay = QLabel("# Days")
         self.SpinBox_numberDay = QSpinBox()
         self.SpinBox_numberDay.setValue(1)
         self.SpinBox_numberDay.setMinimum (1)
         self.pushButton_Update = QPushButton("Update Now")
+        self.SpinBox_samplingRate = QSpinBox()
+        self.SpinBox_samplingRate.setMinimum(1)
+        self.SpinBox_samplingRate.setMaximum(600)
+        self.SpinBox_samplingRate.setValue(120)
 
 
         #For refill
@@ -129,9 +134,11 @@ class Ui_Widget():
         self.RTLayout.addWidget(QLabel("Display"), 10, 1)
         self.RTLayout.addWidget(QLabel("Current NV"), 10, 3)
         self.RTLayout.addWidget(QLabel("??"), 11, 3)
-        self.RTLayout.addWidget(self.lable_numberDay, 11, 0)
+        self.RTLayout.addWidget(QLabel("# Days"), 11, 0)
         self.RTLayout.addWidget(self.SpinBox_numberDay, 11, 1)
-        self.RTLayout.addWidget(QLabel(""), 12, 1)
+        self.RTLayout.addWidget(QLabel("sampling rate"), 12, 0)
+        self.RTLayout.addWidget(self.SpinBox_samplingRate, 12, 1)
+        self.RTLayout.addWidget(QLabel(""), 13, 1)
         
 
         #right bottom (refill 1K pot)
@@ -184,11 +191,15 @@ class Ui_Widget():
 class Widget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
+        #time stamp base (using Labview standard, Easter time)
+        self.EPOCH = datetime.datetime(1904 , 1, 1, 0, 0, 0, 0)-datetime.timedelta(hours=5)
+
         self.ui = Ui_Widget()
 
         self.ui.setupUi(self)
         self.ui.connectUi(self)
         self.loadData()
+        self.update()
         
         self.message=[]
         self.updateMessage("launch temperature control")
@@ -204,11 +215,27 @@ class Widget(QWidget):
 
     def loadData(self):
         n_days = self.ui.SpinBox_numberDay.value()
-        self.time = np.linspace(0,10,101)
-        self.T_1K = np.random.normal(1.2,0.02,101)
-        self.T_SHD_TOP = np.random.normal(1.2,0.02,101)
-        self.T_MAG_TOP = np.random.normal(2,0.0001,101)
-        self.T_MAG_BOT = np.random.normal(2,0.0001,101)
+        first_date = datetime.date.today()-datetime.timedelta(days=n_days-1)
+        path_name = []
+        for i in range(n_days):
+            date = first_date+datetime.timedelta(days=i)
+            year , month , day = (date.year%100 , date.month , date.day)
+            path_name.append("{0}{1:02d}{2:02d}{3:02d}.txt".format(self.ui.lineEdit_path.text(),year,month,day))
+
+        self.time = np.empty(0)
+        self.T_1K = np.empty(0)
+        self.T_SHD_TOP = np.empty(0)
+        self.T_MAG_TOP = np.empty(0)
+        self.T_MAG_BOT = np.empty(0)
+        for path_name_ind in path_name:
+            df = pd.read_csv(path_name_ind , header=None)
+            self.time = np.append(self.time , np.asarray(df[0]))
+            self.T_1K = np.append(self.T_1K , np.asarray(df[1]))
+            self.T_SHD_TOP = np.append(self.T_SHD_TOP , np.asarray(df[2]))
+            self.T_MAG_TOP = np.append(self.T_MAG_TOP , np.asarray(df[3]))
+            self.T_MAG_BOT = np.append(self.T_MAG_BOT , np.asarray(df[4]))
+        self.time = np.asarray(pd.to_datetime(self.time,unit="s",origin=pd.Timestamp('1904-01-01 0:0:0')))
+
 
     @Slot()
     def change_yScale(self):
@@ -269,13 +296,14 @@ class Widget(QWidget):
             self.ui.ax.set_ylim(bottom , top)
         else:
             self.ui.ax.autoscale()
+        dtFmt = mdates.DateFormatter("%m-%d\n%H:%M") # define the formatting
+        self.ui.ax.xaxis.set_major_formatter(dtFmt) 
         self.ui.canvas.figure.canvas.draw()
 
     @Slot()
     def dayShown(self):
-        print("showing",self.ui.SpinBox_numberDay.value())
-        # self.loadData()
-        # self.update()
+        self.loadData()
+        self.update()
 
     @Slot()
     def potSchedule(self):
