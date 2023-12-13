@@ -4,21 +4,18 @@ import datetime
 import numpy as np
 import pandas as pd
 
-from ApplicationKernel import AppServer
-app = AppServer("app_Tcontroll")
-itc = app.addInstrument("inst_itcSIM")
-# # itc = app.addInstrument('inst_itcGPIB')
-
 from PySide6.QtGui import QPalette, QColor
 from PySide6.QtWidgets import (QApplication , QWidget , QGridLayout ,
                 QPushButton , QTimeEdit , QLineEdit , QSpinBox , QLabel,
-                QScrollArea , QLCDNumber , QCheckBox)
-from PySide6.QtCore import Signal , Slot , Qt 
+                QScrollArea , QCheckBox)
+from PySide6.QtCore import Slot , Qt  , QTimer
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT
 from matplotlib.figure import Figure
 import matplotlib.dates as mdates
+
+from ApplicationKernel import AppServer
 
 class Ui_Widget():
     def setupUi(self, Widget):
@@ -193,6 +190,8 @@ class Widget(QWidget):
         super().__init__(parent)
         #time stamp base (using Labview standard, Easter time)
         self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
+        # app = AppServer("app_Tcontroll")
+        # self.itc = app.addInstrument("inst_itcSIM")
 
         self.ui = Ui_Widget()
 
@@ -203,6 +202,14 @@ class Widget(QWidget):
         
         self.message=[]
         self.updateMessage("launch temperature control")
+
+        # self.show()
+
+        # self.timer = QTimer()
+        # self.timer.setInterval(1000)
+        # self.timer.timeout.connect(self.measure)
+        # self.timer.start()
+        
 
     def updateMessage(self,new_msg):
         self.message.append(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M ")) + new_msg)
@@ -261,11 +268,12 @@ class Widget(QWidget):
         self.ui.ax.xaxis.set_major_formatter(dtFmt) 
         self.ui.canvas.figure.canvas.draw()
 
+    @Slot()
     def measure(self):
-        T_1K = itc.query("get_1K()") if self.ui.checkBox_1K.isChecked() else 0.
-        T_SHD_TOP = itc.query("get_SHD_TOP()") if self.ui.checkBox_SHD_TOP.isChecked() else 0.
-        T_MAG_TOP = itc.query("get_MAG_TOP()") if self.ui.checkBox_MAG_TOP.isChecked() else 0.
-        T_MAG_BOT = itc.query("get_MAG_BOT()") if self.ui.checkBox_MAG_BOT.isChecked() else 0.
+        T_1K = self.itc.query("get_1K()") if self.ui.checkBox_1K.isChecked() else 0.
+        T_SHD_TOP = self.itc.query("get_SHD_TOP()") if self.ui.checkBox_SHD_TOP.isChecked() else 0.
+        T_MAG_TOP = self.itc.query("get_MAG_TOP()") if self.ui.checkBox_MAG_TOP.isChecked() else 0.
+        T_MAG_BOT = self.itc.query("get_MAG_BOT()") if self.ui.checkBox_MAG_BOT.isChecked() else 0.
         time_now = pd.Timestamp.now()-self.EPOCH_labview
         time_now = time_now.total_seconds()
         today_date = datetime.date.today()
@@ -381,4 +389,6 @@ if __name__ == "__main__":
     app.setPalette( get_darkModePalette( app ) )
     widget = Widget()
     widget.show()
+    # app.exec_()
     sys.exit(app.exec())
+

@@ -13,8 +13,8 @@ import numpy as np
 from ApplicationKernel import AppServer
 
 app = AppServer("app_figure_test")
-itc = app.addInstrument('inst_itcGPIB')
-print(itc.query("get_t1()"))
+itc = app.addInstrument('inst_itcSIM')
+print(itc.query("get_1K()"))
 
 
 
@@ -59,8 +59,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # Drop off the first y element, append a new one.
         self.counter+=1
         self.xdata = np.append(self.xdata,self.counter)
-        self.ydata = np.append(self.ydata,itc.query("get_t1()"))
-        itc.query("get_t1()")
+        self.ydata = np.append(self.ydata,itc.query("get_1K()"))
+        itc.query("get_1K()")
         self.canvas.axes.cla()  # Clear the canvas.
         self.canvas.axes.plot(self.xdata, self.ydata, 'r')
         # Trigger the canvas to update and redraw.
