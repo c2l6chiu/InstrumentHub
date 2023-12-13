@@ -123,8 +123,11 @@ class Ui_Widget():
         self.RTLayout.addWidget(self.pushButton_Update, 8, 1)
         self.RTLayout.addWidget(QLabel(""), 9, 1)
         self.RTLayout.addWidget(QLabel("Display"), 10, 1)
+        self.RTLayout.addWidget(QLabel("Current NV"), 10, 3)
+        self.RTLayout.addWidget(QLabel("??"), 11, 3)
         self.RTLayout.addWidget(self.lable_numberDay, 11, 0)
         self.RTLayout.addWidget(self.SpinBox_numberDay, 11, 1)
+        self.RTLayout.addWidget(QLabel(""), 12, 1)
         
 
         #right bottom (refill 1K pot)
