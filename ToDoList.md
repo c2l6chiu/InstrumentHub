@@ -5,9 +5,6 @@ Make a 1Kpot/temperature application:
 
 Pre launch temperature recorder
 
-update figure 
-
-test scanning
 
 Finish Ardrino /  RS232 / Keithley
 
