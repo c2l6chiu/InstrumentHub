@@ -4,9 +4,9 @@ import datetime
 import numpy as np
 import pandas as pd
 
-# from ApplicationKernel import AppServer
-# app = AppServer("app_Tcontroll")
-# itc = app.addInstrument("inst_itcSIM")
+from ApplicationKernel import AppServer
+app = AppServer("app_Tcontroll")
+itc = app.addInstrument("inst_itcSIM")
 # # itc = app.addInstrument('inst_itcGPIB')
 
 from PySide6.QtGui import QPalette, QColor
@@ -174,7 +174,7 @@ class Ui_Widget():
         self.checkBox_SHD_TOP.stateChanged.connect(Widget.state_SHD_TOP)
         self.checkBox_MAG_TOP.stateChanged.connect(Widget.state_MAG_TOP)
         self.checkBox_MAG_BOT.stateChanged.connect(Widget.state_MAG_BOT)
-        self.pushButton_Update.clicked.connect(Widget.update)
+        self.pushButton_Update.clicked.connect(Widget.force_measure)
         self.SpinBox_numberDay.valueChanged.connect(Widget.dayShown)
         self.CheckBox_schedule.stateChanged.connect(Widget.potSchedule)
         self.CheckBox_repeat.stateChanged.connect(Widget.potRepeate)
@@ -192,7 +192,7 @@ class Widget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         #time stamp base (using Labview standard, Easter time)
-        self.EPOCH = datetime.datetime(1904 , 1, 1, 0, 0, 0, 0)-datetime.timedelta(hours=5)
+        self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
 
         self.ui = Ui_Widget()
 
@@ -234,8 +234,49 @@ class Widget(QWidget):
             self.T_SHD_TOP = np.append(self.T_SHD_TOP , np.asarray(df[2]))
             self.T_MAG_TOP = np.append(self.T_MAG_TOP , np.asarray(df[3]))
             self.T_MAG_BOT = np.append(self.T_MAG_BOT , np.asarray(df[4]))
-        self.time = np.asarray(pd.to_datetime(self.time,unit="s",origin=pd.Timestamp('1904-01-01 0:0:0')))
+        self.time = np.asarray(pd.to_datetime(self.time,unit="s",origin=self.EPOCH_labview))
 
+    def update(self):
+        left , right = self.ui.ax.get_xlim()
+        bottom , top = self.ui.ax.get_ylim()
+
+        self.loadData()
+        self.ui.ax.clear()
+        
+        if self.ui.checkBox_1K.isChecked():
+            self.ui.ax.plot(self.time , self.T_1K)
+        if self.ui.checkBox_SHD_TOP.isChecked():
+            self.ui.ax.plot(self.time , self.T_SHD_TOP)
+        if self.ui.checkBox_MAG_TOP.isChecked():
+            self.ui.ax.plot(self.time , self.T_MAG_TOP)
+        if self.ui.checkBox_MAG_BOT.isChecked():
+            self.ui.ax.plot(self.time , self.T_MAG_BOT)
+
+        if self.ui.checkBox_manualScale.isChecked():
+            self.ui.ax.set_xlim(left , right)
+            self.ui.ax.set_ylim(bottom , top)
+        else:
+            self.ui.ax.autoscale()
+        dtFmt = mdates.DateFormatter("%m-%d\n%H:%M") # define the formatting
+        self.ui.ax.xaxis.set_major_formatter(dtFmt) 
+        self.ui.canvas.figure.canvas.draw()
+
+    def measure(self):
+        T_1K = itc.query("get_1K()") if self.ui.checkBox_1K.isChecked() else 0.
+        T_SHD_TOP = itc.query("get_SHD_TOP()") if self.ui.checkBox_SHD_TOP.isChecked() else 0.
+        T_MAG_TOP = itc.query("get_MAG_TOP()") if self.ui.checkBox_MAG_TOP.isChecked() else 0.
+        T_MAG_BOT = itc.query("get_MAG_BOT()") if self.ui.checkBox_MAG_BOT.isChecked() else 0.
+        time_now = pd.Timestamp.now()-self.EPOCH_labview
+        time_now = time_now.total_seconds()
+        today_date = datetime.date.today()
+        year , month , day = (today_date.year%100 , today_date.month , today_date.day)
+        path_name = "{0}{1:02d}{2:02d}{3:02d}.txt".format(self.ui.lineEdit_path.text(),year,month,day)
+        
+        print(",".join(time_now,T_1K,T_SHD_TOP,T_MAG_TOP,T_MAG_BOT)) 
+
+        with open(path_name) as file:
+            file.wirte(",".join(time_now,T_1K,T_SHD_TOP,T_MAG_TOP,T_MAG_BOT))
+             
 
     @Slot()
     def change_yScale(self):
@@ -261,44 +302,24 @@ class Widget(QWidget):
 
     @Slot()
     def state_1K(self):
-        print("1K state: ",self.ui.checkBox_1K.isChecked())
+        self.update()
 
     @Slot()
     def state_SHD_TOP(self):
-        print("SHD_TOP state: ",self.ui.checkBox_SHD_TOP.isChecked())
+        self.update()
 
     @Slot()
     def state_MAG_TOP(self):
-        print("MAG_TOP state: ",self.ui.checkBox_MAG_TOP.isChecked())
+        self.update()
+
     @Slot()
     def state_MAG_BOT(self):
-        print("MAG_BOT state: ",self.ui.checkBox_MAG_BOT.isChecked())
+        self.update()
 
     @Slot()
-    def update(self):
-        left , right = self.ui.ax.get_xlim()
-        bottom , top = self.ui.ax.get_ylim()
-
-        self.loadData()
-        self.ui.ax.clear()
-        
-        if self.ui.checkBox_1K.isChecked():
-            self.ui.ax.plot(self.time , self.T_1K)
-        if self.ui.checkBox_SHD_TOP.isChecked():
-            self.ui.ax.plot(self.time , self.T_SHD_TOP)
-        if self.ui.checkBox_MAG_TOP.isChecked():
-            self.ui.ax.plot(self.time , self.T_MAG_TOP)
-        if self.ui.checkBox_MAG_BOT.isChecked():
-            self.ui.ax.plot(self.time , self.T_MAG_BOT)
-
-        if self.ui.checkBox_manualScale.isChecked():
-            self.ui.ax.set_xlim(left , right)
-            self.ui.ax.set_ylim(bottom , top)
-        else:
-            self.ui.ax.autoscale()
-        dtFmt = mdates.DateFormatter("%m-%d\n%H:%M") # define the formatting
-        self.ui.ax.xaxis.set_major_formatter(dtFmt) 
-        self.ui.canvas.figure.canvas.draw()
+    def force_measure(self):
+        self.measure()
+        self.update()
 
     @Slot()
     def dayShown(self):
