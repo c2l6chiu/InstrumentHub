@@ -1,5 +1,6 @@
 import sys
 import time
+import datetime
 import numpy as np
 
 # from ApplicationKernel import AppServer
@@ -28,7 +29,7 @@ class Ui_Widget():
         #Message
         self.lineEdit_path = QLineEdit("D:\\temperature record\\")
         self.scrollArea_message = QScrollArea()
-        self.lable_message = QLabel("Message here\n\n\n\n\n\n\n\n\nand here")
+        self.lable_message = QLabel()
         self.scrollArea_message.setWidget(self.lable_message)
 
         #control
@@ -176,8 +177,18 @@ class Widget(QWidget):
 
         self.ui.setupUi(self)
         self.ui.connectUi(self)
-
         
+        self.message=[]
+        self.updateMessage("launch temperature control")
+
+    def updateMessage(self,new_msg):
+        self.message.append(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M ")) + new_msg)
+        if len(self.message) > 100:
+            self.message = self.message[10:len(self.message)]
+        self.ui.lable_message.setText("\n".join(self.message))
+        self.ui.lable_message.adjustSize()
+        vbar = self.ui.scrollArea_message.verticalScrollBar()
+        vbar.setValue(vbar.maximum())
 
     @Slot()
     def autoScale(self):
@@ -212,8 +223,11 @@ class Widget(QWidget):
 
     @Slot()
     def potSchedule(self):
-        print("pot scheduled",self.ui.CheckBox_schedule.isChecked())
-        print(self.ui.timeEdit_schedule.text() , " to: " , self.ui.lineEdit_openTo.text() , " threshold: " , self.ui.lineEdit_threshold.text())
+        if self.ui.CheckBox_schedule.isChecked() == True:
+            self.updateMessage("schedule refill at " + self.ui.timeEdit_schedule.text() + \
+             ", NV to: " + self.ui.lineEdit_openTo.text() + ", threshold: " + self.ui.lineEdit_threshold.text())
+        else:
+            self.updateMessage("cancel scheduled refill")
 
     @Slot()
     def potRepeate(self):
@@ -221,15 +235,15 @@ class Widget(QWidget):
 
     @Slot()
     def refill(self):
-        print("refill")
+        self.updateMessage("refill now")
 
     @Slot()
     def setNV(self):
-        print("set NV to: " , self.ui.lineEdit_setTo.text())
+        self.updateMessage("set NV to " + self.ui.lineEdit_setTo.text())
 
     @Slot()
     def closeNV(self):
-        print("closeNV")
+        self.updateMessage("close NV")
 
 
 def get_darkModePalette( app=None ) :
