@@ -21,63 +21,63 @@ class Ui_Widget():
     def setupUi(self, Widget):
         Widget.setObjectName(u"Temperture control")
         Widget.setWindowTitle(Widget.objectName())
-        Widget.resize(1000, 600)
+        Widget.resize(1000, 500)
 
         #Plot
-        canvas = FigureCanvas(Figure())
+        self.canvas = FigureCanvas(Figure())
 
         #Message
-        lineEdit_path = QLineEdit("D:\\temperature record\\")
-        scrollArea_message = QScrollArea()
-        lable_message = QLabel("Message here\n\n\n\n\n\n\n\n\nand here")
-        scrollArea_message.setWidget(lable_message)
+        self.lineEdit_path = QLineEdit("D:\\temperature record\\")
+        self.scrollArea_message = QScrollArea()
+        self.lable_message = QLabel("Message here\n\n\n\n\n\n\n\n\nand here")
+        self.scrollArea_message.setWidget(self.lable_message)
 
         #control
-        buttonC = QPushButton("control")
+        self.buttonC = QPushButton("control")
 
         #For refill
-        lable_status = QLabel("One")
-        timeEdit_schedule = QTimeEdit()
-        spinBox_openTo = QSpinBox()
-        button_autoClose = QPushButton("Auto close")
-        button_schedule = QPushButton("schedule")
-        button_openTo = QPushButton("open to")
+        self.lable_status = QLabel("One")
+        self.timeEdit_schedule = QTimeEdit()
+        self.spinBox_openTo = QSpinBox()
+        self.button_autoClose = QPushButton("Auto close")
+        self.button_schedule = QPushButton("schedule")
+        self.button_openTo = QPushButton("open to")
 
         #main layout
-        mainLayout = QGridLayout(Widget)
+        self.mainLayout = QGridLayout(Widget)
 
         #left top (temperature)
-        LTLayout = QGridLayout()
-        LTLayout.addWidget(canvas, 0, 0)
-        LTLayout.addWidget(NavigationToolbar(canvas, Widget), 1, 0)
-        ax = canvas.figure.subplots()
+        self.LTLayout = QGridLayout()
+        self.LTLayout.addWidget(self.canvas, 0, 0)
+        self.LTLayout.addWidget(NavigationToolbar(self.canvas, Widget), 1, 0)
+        self.ax = self.canvas.figure.subplots()
         t = np.linspace(0, 10, 501)
-        ax.plot(t, np.tan(t), ".")
+        self.ax.plot(t, np.tan(t), ".")
 
 
         #left bottom (message)
-        LBLayout = QGridLayout()
-        LBLayout.addWidget(lineEdit_path, 0, 0)
-        LBLayout.addWidget(scrollArea_message, 1, 0)
+        self.LBLayout = QGridLayout()
+        self.LBLayout.addWidget(self.lineEdit_path, 0, 0)
+        self.LBLayout.addWidget(self.scrollArea_message, 1, 0)
 
         #right top (read control)
-        RTLayout = QGridLayout()
-        RTLayout.addWidget(buttonC, 0, 0)
+        self.RTLayout = QGridLayout()
+        self.RTLayout.addWidget(self.buttonC, 0, 0)
 
         #right bottom (refill 1K pot)
-        RBLayout = QGridLayout()
-        RBLayout.addWidget(lable_status, 0, 0)
-        RBLayout.addWidget(timeEdit_schedule, 1, 0)
-        RBLayout.addWidget(spinBox_openTo, 2, 0)
-        RBLayout.addWidget(button_autoClose, 0, 1)
-        RBLayout.addWidget(button_schedule, 1, 1)
-        RBLayout.addWidget(button_openTo, 2, 1)
+        self.RBLayout = QGridLayout()
+        self.RBLayout.addWidget(self.lable_status, 0, 0)
+        self.RBLayout.addWidget(self.timeEdit_schedule, 1, 0)
+        self.RBLayout.addWidget(self.spinBox_openTo, 2, 0)
+        self.RBLayout.addWidget(self.button_autoClose, 0, 1)
+        self.RBLayout.addWidget(self.button_schedule, 1, 1)
+        self.RBLayout.addWidget(self.button_openTo, 2, 1)
 
 
-        mainLayout.addLayout(LTLayout,0,0,6,5)
-        mainLayout.addLayout(LBLayout,6,0)
-        mainLayout.addLayout(RTLayout,0,5)
-        mainLayout.addLayout(RBLayout,6,5)
+        self.mainLayout.addLayout(self.LTLayout,0,0,3,5)
+        self.mainLayout.addLayout(self.LBLayout,3,0)
+        self.mainLayout.addLayout(self.RTLayout,0,5)
+        self.mainLayout.addLayout(self.RBLayout,3,5)
 
 
 
