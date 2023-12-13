@@ -144,10 +144,12 @@ class Ui_Widget():
         self.RBLayout.addWidget(self.button_closeNV, 4, 2)
 
 
-        self.mainLayout.addLayout(self.LTLayout,0,0,3,5)
-        self.mainLayout.addLayout(self.LBLayout,3,0)
-        self.mainLayout.addLayout(self.RTLayout,0,5)
-        self.mainLayout.addLayout(self.RBLayout,3,5)
+        self.mainLayout.addLayout(self.LTLayout,0,0)
+        self.mainLayout.addLayout(self.LBLayout,1,0)
+        self.mainLayout.addLayout(self.RTLayout,0,1)
+        self.mainLayout.addLayout(self.RBLayout,1,1)
+        self.mainLayout.setColumnStretch(0, 100)
+        self.mainLayout.setRowStretch(0, 10)
 
     def connectUi(self, Widget):
         self.button_autoScale.clicked.connect(Widget.autoScale)
