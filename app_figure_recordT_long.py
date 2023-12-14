@@ -53,6 +53,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timer.setInterval(4000)
         self.timer.timeout.connect(self.update_plot)
         self.timer.start()
+
+    def closeEvent(self, event):
+        # here you can terminate your threads and do other stuff
+        app.__del__()
+        itc.__del__()
+        # and afterwards call the closeEvent of the super-class
+        super().closeEvent(event)
     
 
     def update_plot(self):

@@ -15,7 +15,9 @@ from matplotlib.backends.backend_qtagg import NavigationToolbar2QT
 from matplotlib.figure import Figure
 import matplotlib.dates as mdates
 
-from ApplicationKernel import AppServer
+# from ApplicationKernel import AppServer
+# app = AppServer("app_Tcontroll")
+# itc = app.addInstrument("inst_itcSIM")
 
 class Ui_Widget():
     def setupUi(self, Widget):
@@ -190,8 +192,7 @@ class Widget(QWidget):
         super().__init__(parent)
         #time stamp base (using Labview standard, Easter time)
         self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
-        # app = AppServer("app_Tcontroll")
-        # self.itc = app.addInstrument("inst_itcSIM")
+
 
         self.ui = Ui_Widget()
 
@@ -210,6 +211,11 @@ class Widget(QWidget):
         # self.timer.timeout.connect(self.measure)
         # self.timer.start()
         
+    def closeEvent(self, event):
+        # here you can terminate your threads and do other stuff
+        print("close")
+        # and afterwards call the closeEvent of the super-class
+        super().closeEvent(event)
 
     def updateMessage(self,new_msg):
         self.message.append(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M ")) + new_msg)
@@ -385,10 +391,11 @@ def get_darkModePalette( app=None ) :
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setPalette( get_darkModePalette( app ) )
+    # app.setStyle("Fusion")
+    # app.setPalette( get_darkModePalette( app ) )
     widget = Widget()
     widget.show()
-    # app.exec_()
+    # app.exec()
     sys.exit(app.exec())
+
 
