@@ -29,7 +29,8 @@ class Ui_Widget():
         self.canvas = FigureCanvas(Figure())
 
         #Message
-        self.lineEdit_path = QLineEdit("D:\\temperature record\\")
+        # self.lineEdit_path = QLineEdit("D:\\temperature record\\")
+        self.lineEdit_path = QLineEdit("/Users/c2l6chiu/Library/CloudStorage/OneDrive-SharedLibraries-PrincetonUniversity/VFstm - Documents/tmp/")
         self.scrollArea_message = QScrollArea()
         self.lable_message = QLabel()
         self.scrollArea_message.setWidget(self.lable_message)
@@ -241,7 +242,10 @@ class Widget(QWidget):
         self.T_MAG_TOP = np.empty(0)
         self.T_MAG_BOT = np.empty(0)
         for path_name_ind in path_name:
-            df = pd.read_csv(path_name_ind , header=None)
+            try:
+                df = pd.read_csv(path_name_ind , header=None)
+            except:
+                continue
             self.time = np.append(self.time , np.asarray(df[0]))
             self.T_1K = np.append(self.T_1K , np.asarray(df[1]))
             self.T_SHD_TOP = np.append(self.T_SHD_TOP , np.asarray(df[2]))
