@@ -26,7 +26,7 @@ t_instMom = Thread(target=instMom.server,args=())
 t_instMom.start()
 
 #pre-launch Instrument
-# pre_instrument_list = ['inst_dog',"inst_itc"]
+# pre_instrument_list = ['inst_dog']
 # pre_instrument_list = ['inst_dog',"inst_itcGPIB","inst_nanonis","inst_nanonisUDP" ]
 pre_instrument_list = ["inst_nanonis","inst_itcSIM"]
 

@@ -45,8 +45,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.show()
 
-        
-
 
         # Setup a timer to trigger the redraw by calling update_plot.
         self.timer = QtCore.QTimer()

@@ -14,14 +14,14 @@ class ServiceLine():
         self.que_respond = que_respond
         self.status = True
     
-    def __del__(self):
+    def shutdown(self):
+        self.status = False
         self.port_inst_app.close()
-        # pass
-    
+        print("detach from port: "+str(self.port))
+
     def run(self):
         self.port_inst_app = Listener(self.address , authkey= self.authkey_serviceLine)
         self.port_inst_app._listener._socket.settimeout(time_out)
-        
         while self.status:
             try:
                 client = self.port_inst_app.accept()
@@ -31,9 +31,9 @@ class ServiceLine():
                         self.que_command.put((self.port,msg))
                         client.send(self.que_respond.get())
                     except EOFError:
-                        client = self.port_inst_app.accept()
+                        self.shutdown()
             except: #TimeoutError
-                pass
+                pass        
 
 class InstrumentController():
     def __init__(self,the_instrument,qc,qr) -> None:
@@ -48,9 +48,10 @@ class InstrumentController():
             try:
                 self.queue_respond[port].put(eval("self.inst."+commend))    #exec()
             except Exception as eer:
-                self.queue_respond[port].put("error!@#")
-                print(eer)
+                # print(eer)
                 print("error commend: "+commend)
+                self.queue_respond[port].put("error!@#")
+
 
 
 class InstrumentServer():

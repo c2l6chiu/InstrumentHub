@@ -15,9 +15,7 @@ from matplotlib.backends.backend_qtagg import NavigationToolbar2QT
 from matplotlib.figure import Figure
 import matplotlib.dates as mdates
 
-# from ApplicationKernel import AppServer
-# app = AppServer("app_Tcontroll")
-# itc = app.addInstrument("inst_itcSIM")
+from ApplicationKernel import AppServer
 
 class Ui_Widget():
     def setupUi(self, Widget):
@@ -29,8 +27,8 @@ class Ui_Widget():
         self.canvas = FigureCanvas(Figure())
 
         #Message
-        # self.lineEdit_path = QLineEdit("D:\\temperature record\\")
-        self.lineEdit_path = QLineEdit("/Users/c2l6chiu/Library/CloudStorage/OneDrive-SharedLibraries-PrincetonUniversity/VFstm - Documents/tmp/")
+        self.lineEdit_path = QLineEdit("D:\\temperature record\\")
+        # self.lineEdit_path = QLineEdit("/Users/c2l6chiu/Library/CloudStorage/OneDrive-SharedLibraries-PrincetonUniversity/VFstm - Documents/tmp/")
         self.scrollArea_message = QScrollArea()
         self.lable_message = QLabel()
         self.scrollArea_message.setWidget(self.lable_message)
@@ -63,6 +61,8 @@ class Ui_Widget():
         self.SpinBox_numberDay = QSpinBox()
         self.SpinBox_numberDay.setValue(1)
         self.SpinBox_numberDay.setMinimum (1)
+        self.SpinBox_numberDay.setMaximum (14)
+        self.lable_NV = QLabel("??")
         self.pushButton_Update = QPushButton("Update Now")
         self.SpinBox_samplingRate = QSpinBox()
         self.SpinBox_samplingRate.setMinimum(1)
@@ -133,7 +133,7 @@ class Ui_Widget():
         self.RTLayout.addWidget(QLabel(""), 9, 1)
         self.RTLayout.addWidget(QLabel("Display"), 10, 1)
         self.RTLayout.addWidget(QLabel("Current NV"), 10, 3)
-        self.RTLayout.addWidget(QLabel("??"), 11, 3)
+        self.RTLayout.addWidget(self.lable_NV, 11, 3)
         self.RTLayout.addWidget(QLabel("# Days"), 11, 0)
         self.RTLayout.addWidget(self.SpinBox_numberDay, 11, 1)
         self.RTLayout.addWidget(QLabel("sampling rate"), 12, 0)
@@ -176,16 +176,12 @@ class Ui_Widget():
         self.checkBox_MAG_BOT.stateChanged.connect(Widget.state_MAG_BOT)
         self.pushButton_Update.clicked.connect(Widget.force_measure)
         self.SpinBox_numberDay.valueChanged.connect(Widget.dayShown)
+        self.SpinBox_samplingRate.valueChanged.connect(Widget.changeRate)
         self.CheckBox_schedule.stateChanged.connect(Widget.potSchedule)
         self.CheckBox_repeat.stateChanged.connect(Widget.potRepeate)
         self.button_refill.clicked.connect(Widget.refill)
         self.button_setNV.clicked.connect(Widget.setNV)
         self.button_closeNV.clicked.connect(Widget.closeNV)
-
-        
-
-# def stateChanged (arg__1)
-# def checkState ()
 
 
 class Widget(QWidget):
@@ -193,10 +189,13 @@ class Widget(QWidget):
         super().__init__(parent)
         #time stamp base (using Labview standard, Easter time)
         self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
-
+        
+        self.app = AppServer("app_Tcontroll")
+        self.itc = self.app.addInstrument("inst_itcSIM")
+        self.refill_state = False
+        # self.itc = self.app.addInstrument("inst_dog")
 
         self.ui = Ui_Widget()
-
         self.ui.setupUi(self)
         self.ui.connectUi(self)
         self.loadData()
@@ -205,17 +204,14 @@ class Widget(QWidget):
         self.message=[]
         self.updateMessage("launch temperature control")
 
-        # self.show()
+        self.samplingTimer = QTimer()
+        rate = self.ui.SpinBox_samplingRate.value()
+        self.samplingTimer.setInterval(rate*1000)
+        self.samplingTimer.timeout.connect(self.force_measure)
+        self.samplingTimer.start()
 
-        # self.timer = QTimer()
-        # self.timer.setInterval(1000)
-        # self.timer.timeout.connect(self.measure)
-        # self.timer.start()
-        
     def closeEvent(self, event):
-        # here you can terminate your threads and do other stuff
-        print("close")
-        # and afterwards call the closeEvent of the super-class
+        del self.app
         super().closeEvent(event)
 
     def updateMessage(self,new_msg):
@@ -278,23 +274,45 @@ class Widget(QWidget):
         self.ui.ax.xaxis.set_major_formatter(dtFmt) 
         self.ui.canvas.figure.canvas.draw()
 
-    @Slot()
     def measure(self):
+        #save data into file only, won't update self.T,self.t
         T_1K = self.itc.query("get_1K()") if self.ui.checkBox_1K.isChecked() else 0.
         T_SHD_TOP = self.itc.query("get_SHD_TOP()") if self.ui.checkBox_SHD_TOP.isChecked() else 0.
         T_MAG_TOP = self.itc.query("get_MAG_TOP()") if self.ui.checkBox_MAG_TOP.isChecked() else 0.
         T_MAG_BOT = self.itc.query("get_MAG_BOT()") if self.ui.checkBox_MAG_BOT.isChecked() else 0.
         time_now = pd.Timestamp.now()-self.EPOCH_labview
-        time_now = time_now.total_seconds()
+        time_now = int(time_now.total_seconds())
         today_date = datetime.date.today()
         year , month , day = (today_date.year%100 , today_date.month , today_date.day)
         path_name = "{0}{1:02d}{2:02d}{3:02d}.txt".format(self.ui.lineEdit_path.text(),year,month,day)
-        
-        print(",".join(time_now,T_1K,T_SHD_TOP,T_MAG_TOP,T_MAG_BOT)) 
 
-        with open(path_name) as file:
-            file.wirte(",".join(time_now,T_1K,T_SHD_TOP,T_MAG_TOP,T_MAG_BOT))
-             
+        with open(path_name,'a') as file:
+            file.write("{0:d},{1:.4f},{2:.4f},{3:.4f},{4:.4f}\n".format(time_now,T_1K,T_SHD_TOP,T_MAG_TOP,T_MAG_BOT))
+
+        self.ui.LCD_1K.setText("{0:.4f}".format(T_1K))
+        self.ui.LCD_SHD_TOP.setText("{0:.4f}".format(T_SHD_TOP))
+        self.ui.LCD_MAG_TOP.setText("{0:.4f}".format(T_MAG_TOP))
+        self.ui.LCD_MAG_BOT.setText("{0:.4f}".format(T_MAG_BOT))
+
+    def fill_pot(self):
+        self.refill_state = True
+        NV = int(self.ui.lineEdit_openTo.text())
+        T_threshold = float(self.ui.lineEdit_threshold.text())
+        self.ui.button_refill.setStyleSheet("background-color: red")
+        self.ui.button_refill.setText("refilling...")
+
+        self.updateMessage("refilling 1K pot now NV="+str(NV)+" threshold= "+"{0:.4f}".format(T_threshold))
+
+
+    def stop_fill_pot(self):
+        self.refill_state = False
+        self.ui.button_refill.setStyleSheet("background-color: rgb(53, 53, 53)")
+        self.ui.button_refill.setText("refill now")
+
+        self.updateMessage("stop filling")
+
+    def refill_monitor(self):
+        pass
 
     @Slot()
     def change_yScale(self):
@@ -336,13 +354,20 @@ class Widget(QWidget):
 
     @Slot()
     def force_measure(self):
+        self.ui.lable_NV.setText(str(self.itc.query("get_NV()")))
         self.measure()
+        self.loadData()
         self.update()
 
     @Slot()
     def dayShown(self):
         self.loadData()
         self.update()
+
+    @Slot()
+    def changeRate(self):
+        rate = self.ui.SpinBox_samplingRate.value()
+        self.samplingTimer.setInterval(rate*1000)
 
     @Slot()
     def potSchedule(self):
@@ -358,15 +383,20 @@ class Widget(QWidget):
 
     @Slot()
     def refill(self):
-        self.updateMessage("refill now")
+        if not self.refill_state: self.fill_pot()
+        else: self.stop_fill_pot()
 
     @Slot()
     def setNV(self):
-        self.updateMessage("set NV to " + self.ui.lineEdit_setTo.text())
+        self.updateMessage("set_NV("+self.ui.lineEdit_setTo.text()+")")
+        self.itc.query("set_NV("+self.ui.lineEdit_setTo.text()+")")
+        if self.refill_state: self.stop_fill_pot()
 
     @Slot()
     def closeNV(self):
         self.updateMessage("close NV")
+        self.itc.query("set_NV(0)")
+        if self.refill_state: self.stop_fill_pot()
 
 
 def get_darkModePalette( app=None ) :
@@ -395,8 +425,8 @@ def get_darkModePalette( app=None ) :
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    # app.setStyle("Fusion")
-    # app.setPalette( get_darkModePalette( app ) )
+    app.setStyle("Fusion")
+    app.setPalette( get_darkModePalette( app ) )
     widget = Widget()
     widget.show()
     # app.exec()

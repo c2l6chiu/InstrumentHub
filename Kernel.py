@@ -90,7 +90,7 @@ class AppServer():
 
                         if pieces[1] == "new_app":
                             #check if the instrument exist
-                            if not self.checkInstrument(pieces[4]): self.errorRequest('no such instrument')
+                            if not self.checkInstrument(pieces[4]): self.errorRequest('no such instrument: '+pieces[4])
                             #prepare a port for application
                             port = self.createPort(pieces[2]+'-'+pieces[3]+'-'+pieces[4])   #app_name - serial
 

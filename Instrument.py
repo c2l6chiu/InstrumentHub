@@ -81,8 +81,9 @@ while True:
     elif commend == "close":
         port = arg
         ser_pool[port].status = False
-        ser = ser_pool[port]
-        del ser
+        # ser = ser_pool[port]
+        # del ser
+        # ser_pool[port].shutdown()
         del ser_pool[port]
         del que_respond[port]
 

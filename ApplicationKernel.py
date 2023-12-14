@@ -7,11 +7,13 @@ class AppServer():
     authkey_AppServer = b'vf@pnml1234'
     app_name = 'default'
     serial_number = str(random.randrange(1,10000))
+    stack_coordinator=[]
 
     def __init__(self,name):
         self.app_name = name
 
     def __del__(self):
+        self.shutdown()
         message = "app_request-close_app"
         message += '-'+self.app_name+'-'+self.serial_number
         self.ask(message)
@@ -19,6 +21,7 @@ class AppServer():
     def addInstrument(self,name):
         address_serviceLine,authkey_serviceLine = self.askPort(name)
         coordinator = Coordinator(address_serviceLine,authkey_serviceLine)
+        self.stack_coordinator.append(coordinator)
         return coordinator
 
     def askPort(self,inst_name):
@@ -34,6 +37,11 @@ class AppServer():
         info = port_app_kern.recv()
         port_app_kern.close()
         return info
+    
+    def shutdown(self):
+        for coor in self.stack_coordinator:
+            coor.shutdown()
+
 
 
 
@@ -42,7 +50,7 @@ class Coordinator():
     def __init__(self,link_address,authkey):
         self.port_app_inst= Client(link_address, authkey=authkey)
     
-    def __del__(self):
+    def shutdown(self):
         self.port_app_inst.close()
 
     def set(self,question):
