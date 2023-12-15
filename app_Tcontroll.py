@@ -198,6 +198,7 @@ class Widget(QWidget):
         self.ui = Ui_Widget()
         self.ui.setupUi(self)
         self.ui.connectUi(self)
+        self.measure()
         self.loadData()
         self.update()
         
@@ -294,25 +295,37 @@ class Widget(QWidget):
         self.ui.LCD_MAG_TOP.setText("{0:.4f}".format(T_MAG_TOP))
         self.ui.LCD_MAG_BOT.setText("{0:.4f}".format(T_MAG_BOT))
 
+        #NV position
+        self.ui.lable_NV.setText(str(self.itc.query("get_NV()")))
+
     def fill_pot(self):
-        self.refill_state = True
         NV = int(self.ui.lineEdit_openTo.text())
         T_threshold = float(self.ui.lineEdit_threshold.text())
         self.ui.button_refill.setStyleSheet("background-color: red")
         self.ui.button_refill.setText("refilling...")
+        self.itc.query("set_NV("+str(NV)+")")
+        self.refill_monitor_on(T_threshold)
 
-        self.updateMessage("refilling 1K pot now NV="+str(NV)+" threshold= "+"{0:.4f}".format(T_threshold))
+        self.updateMessage("refilling 1K pot NV="+str(NV)+" threshold= "+"{0:.4f}".format(T_threshold))
+        self.updateMessage("pot monitor on")
 
+        # if not self.ui.CheckBox_repeat.isChecked(): self.ui.CheckBox_schedule.setChecked(False) 
 
     def stop_fill_pot(self):
         self.refill_state = False
         self.ui.button_refill.setStyleSheet("background-color: rgb(53, 53, 53)")
         self.ui.button_refill.setText("refill now")
+        self.refill_monitor_off()
+        self.itc.query("set_NV(0)")
 
-        self.updateMessage("stop filling")
+        self.updateMessage("stop filling NV=0")
+        self.updateMessage("pot monitor off")
 
-    def refill_monitor(self):
-        pass
+    def refill_monitor_on(self,threshold):
+        self.refill_state = True
+
+    def refill_monitor_off(self):
+        self.refill_state = False
 
     @Slot()
     def change_yScale(self):
@@ -354,7 +367,6 @@ class Widget(QWidget):
 
     @Slot()
     def force_measure(self):
-        self.ui.lable_NV.setText(str(self.itc.query("get_NV()")))
         self.measure()
         self.loadData()
         self.update()
@@ -375,11 +387,21 @@ class Widget(QWidget):
             self.updateMessage("schedule refill at " + self.ui.timeEdit_schedule.text() + \
              ", NV to: " + self.ui.lineEdit_openTo.text() + ", threshold: " + self.ui.lineEdit_threshold.text())
         else:
+            # if not self.refill_state: 
             self.updateMessage("cancel scheduled refill")
 
     @Slot()
+    def timesUp(self):
+        self.fill_pot()
+        if self.ui.CheckBox_repeat.isChecked():
+            self.potSchedule()
+        else:
+            self.ui.CheckBox_schedule.setChecked(False) 
+
+    @Slot()
     def potRepeate(self):
-        print("pot scheduled",self.ui.CheckBox_repeat.isChecked())
+        pass
+        # print("pot scheduled",self.ui.CheckBox_repeat.isChecked())
 
     @Slot()
     def refill(self):
