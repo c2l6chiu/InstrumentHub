@@ -180,7 +180,6 @@ class Ui_Widget():
         self.SpinBox_numberDay.valueChanged.connect(Widget.dayShown)
         self.SpinBox_samplingRate.valueChanged.connect(Widget.changeRate)
         self.CheckBox_schedule.stateChanged.connect(Widget.potSchedule)
-        # self.CheckBox_repeat.stateChanged.connect(Widget.potRepeate)
         self.button_refill.clicked.connect(Widget.refill)
         self.button_setNV.clicked.connect(Widget.setNV)
         self.button_closeNV.clicked.connect(Widget.closeNV)
@@ -188,22 +187,27 @@ class Ui_Widget():
 class Widget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        #time stamp base (using Labview standard, Easter time)
-        self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
-        self.potFullT = 1.5
 
+        #connect to ITC
         self.app = AppServer("app_Tcontroll")
         self.itc = self.app.addInstrument("inst_itcSIM")
-        self.refill_state = False
-        # self.itc = self.app.addInstrument("inst_dog")
+
+        #time stamp base (using Labview standard, Easter time)
+        self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
+        self.potFullT = 1.5     #filled up temperature
+        self.refill_state = False   #whether the 1K pot is filling with monitor on
+        self.initail_cool = False
 
         self.ui = Ui_Widget()
         self.ui.setupUi(self)
         self.ui.connectUi(self)
+
+        #for the first data point
         self.measure()
         self.loadData()
         self.update()
         
+        #first message
         self.message=[]
         self.updateMessage("launch temperature control")
 
@@ -219,7 +223,7 @@ class Widget(QWidget):
         self.scheduleTimer.setSingleShot(True)
         self.scheduleTimer.timeout.connect(self.timesUp)
 
-        #pot monitor timer
+        #pot monitor timer (I am using every 5 second for now)
         self.potMonitorTimer = QTimer()
         self.potMonitorTimer.setInterval(10*1000)
         self.potMonitorTimer.timeout.connect(self.refill_monitor)
@@ -341,6 +345,18 @@ class Widget(QWidget):
 
     def refill_monitor_on(self,threshold):
         self.potFullT = threshold
+
+        #check if this is refilling from empty pot
+        time_gap = pd.Timedelta(seconds=5)
+        time_now = pd.Timestamp.now()
+        T1K_now = self.itc.query("get_1K()") if time_now-self.mostCurrentTime > time_gap else self.mostCurrentT_1K
+
+        if T1K_now > self.potFullT-0.01:
+            self.initail_cool = True
+            self.updateMessage("current temperature higher than threshold...")
+        else:
+            self.initail_cool = False
+
         self.potMonitorTimer.start()
 
     def refill_monitor_off(self):
@@ -351,7 +367,11 @@ class Widget(QWidget):
         time_gap = pd.Timedelta(seconds=5)
         time_now = pd.Timestamp.now()
         T1K_now = self.itc.query("get_1K()") if time_now-self.mostCurrentTime > time_gap else self.mostCurrentT_1K
-        if T1K_now > self.potFullT:
+        if self.initail_cool and T1K_now < self.potFullT-0.01:
+            self.updateMessage("temperature drop below threshold, start refill monitor")
+            self.initail_cool = False
+
+        if (not self.initail_cool) and T1K_now > self.potFullT:
             self.stop_fill_pot()
         # else:
         #     print("not full yet")

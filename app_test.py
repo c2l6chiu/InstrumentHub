@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 app = AppServer("app_test")
 itc = app.addInstrument("inst_itcSIM")
-itc.query("change_baseT(1.8)")
+itc.query("change_baseT(0)")
 # nanonis = app.addInstrument('inst_nanonis')
 
 # print(nanonis.query("scan_io('3','1')"))
