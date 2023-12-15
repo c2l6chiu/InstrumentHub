@@ -5,6 +5,9 @@ class Inst():
         self.t = 1.2
         self.NV = 0
 
+    def change_baseT(self,newT):
+        self.t = newT
+
     def get_1K(self):
         return self.t+random.gauss(0,0.02)
 

@@ -3,7 +3,9 @@ import time
 import matplotlib.pyplot as plt
 
 app = AppServer("app_test")
-nanonis = app.addInstrument('inst_nanonis')
+itc = app.addInstrument("inst_itcSIM")
+itc.query("change_baseT(1.8)")
+# nanonis = app.addInstrument('inst_nanonis')
 
 # print(nanonis.query("scan_io('3','1')"))
 # print(nanonis.query("scan_io_q()"))
@@ -18,7 +20,7 @@ nanonis = app.addInstrument('inst_nanonis')
 # print(nanonis.query("scan_speed(5,4)"))
 # print(nanonis.query("scan_speed_q()"))
 
-print(nanonis.query("lockin_setting_q()")) 
+# print(nanonis.query("lockin_setting_q()")) 
 
 # nanonisUDP = app.addInstrument('inst_nanonisUDP')
 

@@ -8,7 +8,7 @@ from PySide6.QtGui import QPalette, QColor
 from PySide6.QtWidgets import (QApplication , QWidget , QGridLayout ,
                 QPushButton , QTimeEdit , QLineEdit , QSpinBox , QLabel,
                 QScrollArea , QCheckBox)
-from PySide6.QtCore import Slot , Qt  , QTimer
+from PySide6.QtCore import Slot , Qt  , QTimer , QTime
 
 from matplotlib.backends.backend_qtagg import FigureCanvas
 from matplotlib.backends.backend_qtagg import NavigationToolbar2QT
@@ -178,7 +178,7 @@ class Ui_Widget():
         self.SpinBox_numberDay.valueChanged.connect(Widget.dayShown)
         self.SpinBox_samplingRate.valueChanged.connect(Widget.changeRate)
         self.CheckBox_schedule.stateChanged.connect(Widget.potSchedule)
-        self.CheckBox_repeat.stateChanged.connect(Widget.potRepeate)
+        # self.CheckBox_repeat.stateChanged.connect(Widget.potRepeate)
         self.button_refill.clicked.connect(Widget.refill)
         self.button_setNV.clicked.connect(Widget.setNV)
         self.button_closeNV.clicked.connect(Widget.closeNV)
@@ -189,7 +189,8 @@ class Widget(QWidget):
         super().__init__(parent)
         #time stamp base (using Labview standard, Easter time)
         self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
-        
+        self.potFullT = 1.5
+
         self.app = AppServer("app_Tcontroll")
         self.itc = self.app.addInstrument("inst_itcSIM")
         self.refill_state = False
@@ -205,11 +206,22 @@ class Widget(QWidget):
         self.message=[]
         self.updateMessage("launch temperature control")
 
+        #measuring timer
         self.samplingTimer = QTimer()
         rate = self.ui.SpinBox_samplingRate.value()
         self.samplingTimer.setInterval(rate*1000)
         self.samplingTimer.timeout.connect(self.force_measure)
         self.samplingTimer.start()
+
+        #pot scheduler timer
+        self.scheduleTimer = QTimer()
+        self.scheduleTimer.setSingleShot(True)
+        self.scheduleTimer.timeout.connect(self.timesUp)
+
+        #pot monitor timer
+        self.potMonitorTimer = QTimer()
+        self.potMonitorTimer.setInterval(10*1000)
+        self.potMonitorTimer.timeout.connect(self.refill_monitor)
 
     def closeEvent(self, event):
         del self.app
@@ -249,6 +261,8 @@ class Widget(QWidget):
             self.T_MAG_TOP = np.append(self.T_MAG_TOP , np.asarray(df[3]))
             self.T_MAG_BOT = np.append(self.T_MAG_BOT , np.asarray(df[4]))
         self.time = np.asarray(pd.to_datetime(self.time,unit="s",origin=self.EPOCH_labview))
+        self.mostCurrentTime = self.time[-1]
+        self.mostCurrentT_1K = self.T_1K[-1]
 
     def update(self):
         left , right = self.ui.ax.get_xlim()
@@ -323,9 +337,22 @@ class Widget(QWidget):
 
     def refill_monitor_on(self,threshold):
         self.refill_state = True
+        self.potFullT = threshold
+        self.potMonitorTimer.start()
 
     def refill_monitor_off(self):
         self.refill_state = False
+        self.potMonitorTimer.stop()
+
+    @Slot()
+    def refill_monitor(self):
+        time_gap = pd.Timedelta(seconds=5)
+        time_now = pd.Timestamp.now()
+        T1K_now = self.itc.query("get_1K()") if time_now-self.mostCurrentTime > time_gap else self.mostCurrentT_1K
+        if T1K_now > self.potFullT:
+            self.stop_fill_pot()
+        # else:
+        #     print("not full yet")
 
     @Slot()
     def change_yScale(self):
@@ -384,11 +411,26 @@ class Widget(QWidget):
     @Slot()
     def potSchedule(self):
         if self.ui.CheckBox_schedule.isChecked() == True:
+            time_now = QTime.currentTime()
+            time_schedule = self.ui.timeEdit_schedule.time()
+            time_remainS = (time_schedule.hour()-time_now.hour())*3600 + \
+                            (time_schedule.minute()-time_now.minute())*60 +\
+                            (0-time_now.second())
+            if time_remainS <= 0:
+                time_remainS +=86400
+                self.updateMessage("schedule for tomorrow")
+            else:
+                self.updateMessage("schedule for today")
+            self.scheduleTimer.setInterval(time_remainS*1000)
+            self.scheduleTimer.start()
+
+
             self.updateMessage("schedule refill at " + self.ui.timeEdit_schedule.text() + \
              ", NV to: " + self.ui.lineEdit_openTo.text() + ", threshold: " + self.ui.lineEdit_threshold.text())
         else:
             # if not self.refill_state: 
             self.updateMessage("cancel scheduled refill")
+            # self.scheduleTimer.stop()
 
     @Slot()
     def timesUp(self):
@@ -398,10 +440,10 @@ class Widget(QWidget):
         else:
             self.ui.CheckBox_schedule.setChecked(False) 
 
-    @Slot()
-    def potRepeate(self):
-        pass
-        # print("pot scheduled",self.ui.CheckBox_repeat.isChecked())
+    # @Slot()
+    # def potRepeate(self):
+    #     pass
+    #     # print("pot scheduled",self.ui.CheckBox_repeat.isChecked())
 
     @Slot()
     def refill(self):
