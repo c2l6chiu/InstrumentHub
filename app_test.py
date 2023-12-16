@@ -3,8 +3,11 @@ import time
 import matplotlib.pyplot as plt
 
 app = AppServer("app_test")
-itc = app.addInstrument("inst_itcSIM")
-itc.query("change_baseT(0)")
+# itc = app.addInstrument("inst_itcSIM")
+itc = app.addInstrument("inst_itcRS232")
+print(itc.query("get_1K()"))
+
+# itc.query("change_baseT(0)")
 # nanonis = app.addInstrument('inst_nanonis')
 
 # print(nanonis.query("scan_io('3','1')"))

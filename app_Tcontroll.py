@@ -4,7 +4,7 @@ import datetime
 import numpy as np
 import pandas as pd
 
-from PySide6.QtGui import QPalette, QColor
+from PySide6.QtGui import QPalette, QColor , QIcon
 from PySide6.QtWidgets import (QApplication , QWidget , QGridLayout ,
                 QPushButton , QTimeEdit , QLineEdit , QSpinBox , QLabel,
                 QScrollArea , QCheckBox)
@@ -22,6 +22,7 @@ class Ui_Widget():
         Widget.setObjectName(u"Temperture control")
         Widget.setWindowTitle(Widget.objectName())
         Widget.resize(1000, 600)
+        # Widget.setWindowIcon(QIcon())
 
         #Plot
         self.canvas = FigureCanvas(Figure())
@@ -66,7 +67,7 @@ class Ui_Widget():
         self.lable_currentTime = QLabel("??")
         self.pushButton_Update = QPushButton("Update Now")
         self.SpinBox_samplingRate = QSpinBox()
-        self.SpinBox_samplingRate.setMinimum(1)
+        self.SpinBox_samplingRate.setMinimum(4)
         self.SpinBox_samplingRate.setMaximum(600)
         self.SpinBox_samplingRate.setValue(120)
 
@@ -190,7 +191,8 @@ class Widget(QWidget):
 
         #connect to ITC
         self.app = AppServer("app_Tcontroll")
-        self.itc = self.app.addInstrument("inst_itcSIM")
+        # self.itc = self.app.addInstrument("inst_itcSIM")
+        self.itc = self.app.addInstrument("inst_itcRS232")
 
         #time stamp base (using Labview standard, Easter time)
         self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
@@ -223,9 +225,9 @@ class Widget(QWidget):
         self.scheduleTimer.setSingleShot(True)
         self.scheduleTimer.timeout.connect(self.timesUp)
 
-        #pot monitor timer (I am using every 5 second for now)
+        #pot monitor timer (I am using every 20 second for now)
         self.potMonitorTimer = QTimer()
-        self.potMonitorTimer.setInterval(10*1000)
+        self.potMonitorTimer.setInterval(20*1000)
         self.potMonitorTimer.timeout.connect(self.refill_monitor)
 
     def closeEvent(self, event):
@@ -364,7 +366,7 @@ class Widget(QWidget):
 
     @Slot()
     def refill_monitor(self):
-        time_gap = pd.Timedelta(seconds=5)
+        time_gap = pd.Timedelta(seconds=20)
         time_now = pd.Timestamp.now()
         T1K_now = self.itc.query("get_1K()") if time_now-self.mostCurrentTime > time_gap else self.mostCurrentT_1K
         if self.initail_cool and T1K_now < self.potFullT-0.01:
@@ -471,7 +473,12 @@ class Widget(QWidget):
     def setNV(self):
         self.updateMessage("set_NV("+self.ui.lineEdit_setTo.text()+")")
         self.itc.query("set_NV("+self.ui.lineEdit_setTo.text()+")")
-        if self.refill_state: self.stop_fill_pot()
+        if self.refill_state:
+            self.refill_state = False
+            self.ui.button_refill.setStyleSheet("background-color: rgb(53, 53, 53)")
+            self.ui.button_refill.setText("refill now")
+            self.refill_monitor_off()
+            self.updateMessage("pot monitor off")
 
     @Slot()
     def closeNV(self):

@@ -1,7 +1,10 @@
-Make a 1Kpot/temperature application:
-    1. record temperature
-    2. record last filled up time
-    3. control 1K pot fill (full, %, time)
+Tcontroll =>
+    1. finish another ITC connection
+    2. finish slope calculation
+    3. re-measure if getting zero
+    4. maybe get rid of current NV measurement
+    5. add icon
+
 
 Pre launch temperature recorder
 
