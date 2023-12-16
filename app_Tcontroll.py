@@ -1,5 +1,4 @@
-import sys
-import time
+import sys , os
 import datetime
 import numpy as np
 import pandas as pd
@@ -10,8 +9,7 @@ from PySide6.QtWidgets import (QApplication , QWidget , QGridLayout ,
                 QScrollArea , QCheckBox)
 from PySide6.QtCore import Slot , Qt  , QTimer , QTime
 
-from matplotlib.backends.backend_qtagg import FigureCanvas
-from matplotlib.backends.backend_qtagg import NavigationToolbar2QT
+from matplotlib.backends.backend_qtagg import FigureCanvas , NavigationToolbar2QT
 from matplotlib.figure import Figure
 import matplotlib.dates as mdates
 
@@ -22,13 +20,13 @@ class Ui_Widget():
         Widget.setObjectName(u"Temperture control")
         Widget.setWindowTitle(Widget.objectName())
         Widget.resize(1000, 600)
-        # Widget.setWindowIcon(QIcon())
+        Widget.setWindowIcon(QIcon(os.getcwd()+"/icon/blue.png"))
 
         #Plot
         self.canvas = FigureCanvas(Figure())
 
         #Message
-        self.lineEdit_path = QLineEdit("D:\\temperature record\\")
+        self.lineEdit_path = QLineEdit("D:/temperature record/")
         # self.lineEdit_path = QLineEdit("/Users/c2l6chiu/Library/CloudStorage/OneDrive-SharedLibraries-PrincetonUniversity/VFstm - Documents/tmp/")
         self.scrollArea_message = QScrollArea()
         self.lable_message = QLabel()
@@ -63,7 +61,7 @@ class Ui_Widget():
         self.SpinBox_numberDay.setValue(1)
         self.SpinBox_numberDay.setMinimum (1)
         self.SpinBox_numberDay.setMaximum (14)
-        self.lable_NV = QLabel("??")
+        # self.lable_NV = QLabel("??")
         self.lable_currentTime = QLabel("??")
         self.pushButton_Update = QPushButton("Update Now")
         self.SpinBox_samplingRate = QSpinBox()
@@ -134,8 +132,8 @@ class Ui_Widget():
         self.RTLayout.addWidget(self.pushButton_Update, 8, 1)
         self.RTLayout.addWidget(QLabel(""), 9, 1)
         self.RTLayout.addWidget(QLabel("Display"), 10, 1)
-        self.RTLayout.addWidget(QLabel("Current NV"), 10, 3)
-        self.RTLayout.addWidget(self.lable_NV, 11, 3)
+        # self.RTLayout.addWidget(QLabel("Current NV"), 10, 3)
+        # self.RTLayout.addWidget(self.lable_NV, 11, 3)
         self.RTLayout.addWidget(self.lable_currentTime,12,3)
         self.RTLayout.addWidget(QLabel("# Days"), 11, 0)
         self.RTLayout.addWidget(self.SpinBox_numberDay, 11, 1)
@@ -279,13 +277,13 @@ class Widget(QWidget):
         self.ui.ax.clear()
         
         if self.ui.checkBox_1K.isChecked():
-            self.ui.ax.plot(self.time , self.T_1K)
+            self.ui.ax.plot(self.time , self.T_1K, ".-")
         if self.ui.checkBox_SHD_TOP.isChecked():
-            self.ui.ax.plot(self.time , self.T_SHD_TOP)
+            self.ui.ax.plot(self.time , self.T_SHD_TOP, ".-")
         if self.ui.checkBox_MAG_TOP.isChecked():
-            self.ui.ax.plot(self.time , self.T_MAG_TOP)
+            self.ui.ax.plot(self.time , self.T_MAG_TOP, ".-")
         if self.ui.checkBox_MAG_BOT.isChecked():
-            self.ui.ax.plot(self.time , self.T_MAG_BOT)
+            self.ui.ax.plot(self.time , self.T_MAG_BOT, ".-")
 
         if self.ui.checkBox_manualScale.isChecked():
             self.ui.ax.set_xlim(left , right)
@@ -316,8 +314,8 @@ class Widget(QWidget):
         self.ui.LCD_MAG_TOP.setText("{0:.4f}".format(T_MAG_TOP))
         self.ui.LCD_MAG_BOT.setText("{0:.4f}".format(T_MAG_BOT))
 
-        #NV position
-        self.ui.lable_NV.setText(str(self.itc.query("get_NV()")))
+        # #NV position
+        # self.ui.lable_NV.setText(str(self.itc.query("get_NV()")))
         #current time
         self.ui.lable_currentTime.setText("current time\n "+QTime.currentTime().toString())
 

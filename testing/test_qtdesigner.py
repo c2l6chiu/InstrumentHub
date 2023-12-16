@@ -1,5 +1,6 @@
 # This Python file uses the following encoding: utf-8
 import sys
+import os
 
 from PySide6.QtWidgets import QApplication, QWidget
 
@@ -10,6 +11,7 @@ from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import QPalette, QColor , QIcon
 
 from PySide6.QtWidgets import (QApplication, QDateEdit, QHeaderView, QLineEdit,
     QSizePolicy, QSlider, QTableView, QWidget)
@@ -23,6 +25,7 @@ class Widget(QWidget):
     def setupUi(self, Widget):
         if not Widget.objectName():
             Widget.setObjectName(u"Widget")
+        Widget.setWindowIcon(QIcon(os.getcwd()+"\\icon\\blue.png"))
         Widget.resize(800, 600)
         self.tableView = QTableView(Widget)
         self.tableView.setObjectName(u"tableView")

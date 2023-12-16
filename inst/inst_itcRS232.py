@@ -25,31 +25,33 @@ class Inst():
         # self.local()
 
     def get_1K(self):
-        return self.get_t(1)
+        return self.get_t(self.ser,1)
 
     def get_SHD_TOP(self):
-        return self.get_t(2)
+        return self.get_t(self.ser,2)
 
     def get_MAG_TOP(self):
-        return self.get_t(3)
+        return self.get_t(self.ser,3)
 
     def get_MAG_BOT(self):
-        return self.get_t(4)
+        return self.get_t(self.ser,4)
 
-    def get_t(self,n):
+    def get_t(self,ser,n):
         input = 'R'+str(n)+'\r'
-        self.ser.write(input.encode())
+        ser.write(input.encode())
         time.sleep(0.1)
-        result =str(self.ser.read(6),'utf-8')
-        # print(result)
-        self.ser.reset_input_buffer()
+        result =str(ser.read(6),'utf-8')
+        ser.reset_input_buffer()
+
+        if "?" in result: 
+            return self.get_t(self.ser,n)
+        
         temperature = float(result.replace('R','').replace('\r', ''))
 
         if temperature == 0:
-            print(result)
-            return self.get_t(n)
-        else:
-            return temperature
+            return self.get_t(self.ser,n)
+        
+        return temperature
 
     def get_NV(self):
         # input = 'R7\r'

@@ -1,9 +1,6 @@
 Tcontroll =>
     1. finish another ITC connection
     2. finish slope calculation
-    3. re-measure if getting zero
-    4. maybe get rid of current NV measurement
-    5. add icon
 
 
 Pre launch temperature recorder

@@ -1,3 +1,4 @@
+import os
 from multiprocessing.connection import Listener,Client
 from threading import Thread
 import subprocess
@@ -244,7 +245,7 @@ class BootInstrument():
     def communicate(self):
         boot = Listener((self.sys.address_boot,self.sys.port_boot),
                  authkey= self.sys.authkey_boot)
-        subprocess.call('start Instrument.py', shell=True)
+        subprocess.call('start Instrument.py', shell=True , cwd=os.getcwd()+"/inst")
         client = boot.accept()
         #send instrument class
         client.send(self.name)

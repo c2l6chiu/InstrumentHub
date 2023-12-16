@@ -31,7 +31,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self._static_ax = static_canvas.figure.subplots()
         t = np.linspace(0, 10, 501)
-        self._static_ax.plot(t, np.tan(t), ".")
+        self._static_ax.plot(t, np.tan(t), ".-")
 
         self._dynamic_ax = dynamic_canvas.figure.subplots()
         t = np.linspace(0, 10, 101)
