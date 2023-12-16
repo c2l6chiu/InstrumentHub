@@ -1,6 +1,4 @@
-Tcontroll =>
-    1. finish another ITC connection
-    2. finish slope calculation
+Tcontroll  finish another ITC connection
 
 
 Pre launch temperature recorder

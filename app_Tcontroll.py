@@ -53,10 +53,10 @@ class Ui_Widget():
         self.checkBox_SHD_TOP = QCheckBox()
         self.checkBox_MAG_TOP = QCheckBox()
         self.checkBox_MAG_BOT = QCheckBox()
-        self.lable_1K = QLabel("+0.00")
-        self.lable_SHD_TOP = QLabel("+0.00")
-        self.lable_MAG_TOP = QLabel("+0.00")
-        self.lable_MAG_BOT = QLabel("+0.00")
+        self.lable_1K_rate = QLabel("+0.00")
+        self.lable_SHD_TOP_rate = QLabel("+0.00")
+        self.lable_MAG_TOP_rate = QLabel("+0.00")
+        self.lable_MAG_BOT_rate = QLabel("+0.00")
         self.SpinBox_numberDay = QSpinBox()
         self.SpinBox_numberDay.setValue(1)
         self.SpinBox_numberDay.setMinimum (1)
@@ -64,6 +64,9 @@ class Ui_Widget():
         # self.lable_NV = QLabel("??")
         self.lable_currentTime = QLabel("??")
         self.pushButton_Update = QPushButton("Update Now")
+        self.rate_points = QSpinBox()
+        self.rate_points.setValue(10)
+        self.rate_points.setMinimum (2)
         self.SpinBox_samplingRate = QSpinBox()
         self.SpinBox_samplingRate.setMinimum(4)
         self.SpinBox_samplingRate.setMaximum(600)
@@ -125,17 +128,19 @@ class Ui_Widget():
         self.RTLayout.addWidget(self.checkBox_SHD_TOP, 5, 2)
         self.RTLayout.addWidget(self.checkBox_MAG_TOP, 6, 2)
         self.RTLayout.addWidget(self.checkBox_MAG_BOT, 7, 2)
-        self.RTLayout.addWidget(self.lable_1K, 4, 3)
-        self.RTLayout.addWidget(self.lable_SHD_TOP, 5, 3)
-        self.RTLayout.addWidget(self.lable_MAG_TOP, 6, 3)
-        self.RTLayout.addWidget(self.lable_MAG_BOT, 7, 3)
-        self.RTLayout.addWidget(self.pushButton_Update, 8, 1)
-        self.RTLayout.addWidget(QLabel(""), 9, 1)
-        self.RTLayout.addWidget(QLabel("Display"), 10, 1)
+        self.RTLayout.addWidget(self.lable_1K_rate, 4, 3)
+        self.RTLayout.addWidget(self.lable_SHD_TOP_rate, 5, 3)
+        self.RTLayout.addWidget(self.lable_MAG_TOP_rate, 6, 3)
+        self.RTLayout.addWidget(self.lable_MAG_BOT_rate, 7, 3)
+        self.RTLayout.addWidget(self.pushButton_Update, 9, 1)
+        self.RTLayout.addWidget(QLabel("rate from #of points: "), 8, 2)
+        self.RTLayout.addWidget(self.rate_points, 8, 3)
+        # self.RTLayout.addWidget(QLabel(""), 9, 1)
+        self.RTLayout.addWidget(QLabel(""), 10, 1)
         # self.RTLayout.addWidget(QLabel("Current NV"), 10, 3)
         # self.RTLayout.addWidget(self.lable_NV, 11, 3)
         self.RTLayout.addWidget(self.lable_currentTime,12,3)
-        self.RTLayout.addWidget(QLabel("# Days"), 11, 0)
+        self.RTLayout.addWidget(QLabel("show # days"), 11, 0)
         self.RTLayout.addWidget(self.SpinBox_numberDay, 11, 1)
         self.RTLayout.addWidget(QLabel("sampling rate"), 12, 0)
         self.RTLayout.addWidget(self.SpinBox_samplingRate, 12, 1)
@@ -250,7 +255,7 @@ class Widget(QWidget):
             year , month , day = (date.year%100 , date.month , date.day)
             path_name.append("{0}{1:02d}{2:02d}{3:02d}.txt".format(self.ui.lineEdit_path.text(),year,month,day))
 
-        self.time = np.empty(0)
+        self.time_raw = np.empty(0)
         self.T_1K = np.empty(0)
         self.T_SHD_TOP = np.empty(0)
         self.T_MAG_TOP = np.empty(0)
@@ -260,16 +265,33 @@ class Widget(QWidget):
                 df = pd.read_csv(path_name_ind , header=None)
             except:
                 continue
-            self.time = np.append(self.time , np.asarray(df[0]))
+            self.time_raw = np.append(self.time_raw , np.asarray(df[0]))
             self.T_1K = np.append(self.T_1K , np.asarray(df[1]))
             self.T_SHD_TOP = np.append(self.T_SHD_TOP , np.asarray(df[2]))
             self.T_MAG_TOP = np.append(self.T_MAG_TOP , np.asarray(df[3]))
             self.T_MAG_BOT = np.append(self.T_MAG_BOT , np.asarray(df[4]))
-        self.time = np.asarray(pd.to_datetime(self.time,unit="s",origin=self.EPOCH_labview))
+        self.time = np.asarray(pd.to_datetime(self.time_raw,unit="s",origin=self.EPOCH_labview))
         self.mostCurrentTime = self.time[-1]
         self.mostCurrentT_1K = self.T_1K[-1]
 
     def update(self):
+        #rates from # of point
+        pts = self.ui.rate_points.value()
+        try: rate_1K = (self.T_1K[-1] - self.T_1K[-pts]) / (self.time_raw[-1] - self.time_raw[-pts])
+        except: rate_1K = 0
+        try: rate_SHD_TOP = (self.T_SHD_TOP[-1] - self.T_SHD_TOP[-pts]) / (self.time_raw[-1] - self.time_raw[-pts])
+        except: rate_SHD_TOP = 0
+        try: rate_MAG_TOP = (self.T_SHD_TOP[-1] - self.T_SHD_TOP[-pts]) / (self.time_raw[-1] - self.time_raw[-pts])
+        except: rate_MAG_TOP = 0
+        try: rate_BOT_rate = (self.T_MAG_BOT[-1] - self.T_MAG_BOT[-pts]) / (self.time_raw[-1] - self.time_raw[-pts])
+        except: rate_BOT_rate = 0
+
+        self.ui.lable_1K_rate.setText("{0:.2f}".format(rate_1K/60))
+        self.ui.lable_SHD_TOP_rate.setText("{0:.2f}".format(rate_SHD_TOP/60))
+        self.ui.lable_MAG_TOP_rate.setText("{0:.2f}".format(rate_MAG_TOP/60))
+        self.ui.lable_MAG_BOT_rate.setText("{0:.2f}".format(rate_BOT_rate/60))
+
+        #plot data
         left , right = self.ui.ax.get_xlim()
         bottom , top = self.ui.ax.get_ylim()
 
@@ -294,6 +316,8 @@ class Widget(QWidget):
         self.ui.ax.xaxis.set_major_formatter(dtFmt) 
         self.ui.canvas.figure.canvas.draw()
 
+
+
     def measure(self):
         #save data into file only, won't update self.T,self.t
         T_1K = self.itc.query("get_1K()") if self.ui.checkBox_1K.isChecked() else 0.
@@ -316,6 +340,7 @@ class Widget(QWidget):
 
         # #NV position
         # self.ui.lable_NV.setText(str(self.itc.query("get_NV()")))
+
         #current time
         self.ui.lable_currentTime.setText("current time\n "+QTime.currentTime().toString())
 
