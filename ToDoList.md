@@ -1,10 +1,4 @@
-Tcontroll  finish another ITC connection
-
-
-Pre launch temperature recorder
-
-
-Finish Ardrino /  RS232 / Keithley
+Finish Ardrino / Keithley
 
 
 

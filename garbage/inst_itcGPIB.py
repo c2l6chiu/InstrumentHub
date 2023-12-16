@@ -4,7 +4,7 @@ import time
 class Inst():
     def __init__(self):
         rm = pyvisa.ResourceManager()
-        self.itc = rm.open_resource('GPIB0::24::INSTR')
+        self.itc = rm.open_resource('GPIB0::23::INSTR')
         self.itc.read_termination = '\r'
         self.itc.timeout = 20
 
@@ -25,17 +25,17 @@ class Inst():
             pass
         return float(result[1:])
 
-    def set_nv(self, amount):
-        if amount > 50:
-            raise Exception('open needle valve too much')
-        string = 'G0{:3.1f}'.format(float(amount))
-        self.itc.write(string)
-        time.sleep(0.1)
-        try:
-            while True: result = self.itc.read()
-        except:
-            pass
-        return True
+    # def set_nv(self, amount):
+    #     if amount > 50:
+    #         raise Exception('open needle valve too much')
+    #     string = 'G0{:3.1f}'.format(float(amount))
+    #     self.itc.write(string)
+    #     time.sleep(0.1)
+    #     try:
+    #         while True: result = self.itc.read()
+    #     except:
+    #         pass
+    #     return True
 
     # def remote(self):
     #     self.itc.write(b'C3\r')

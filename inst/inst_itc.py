@@ -9,13 +9,18 @@ class Inst():
         self.ser.timeout = 0.4
         self.ser.open()
 
+        self.ser2 = serial.Serial()
+        self.ser2.port = 'COM6'
+        self.ser2.timeout = 0.4
+        self.ser2.open()
 
-        input = 'R7\r'
-        self.ser.write(input.encode())
-        time.sleep(0.1)
-        result =str(self.ser.read(6),'utf-8')
-        self.ser.reset_input_buffer()
-        self.NV = float(result.replace('R+','').replace('\r', ''))
+
+        # input = 'R7\r'
+        # self.ser.write(input.encode())
+        # time.sleep(0.1)
+        # result =str(self.ser.read(6),'utf-8')
+        # self.ser.reset_input_buffer()
+        # self.NV = float(result.replace('R+','').replace('\r', ''))
 
     def __del__(self):
         self.close()
@@ -28,13 +33,13 @@ class Inst():
         return self.get_t(self.ser,1)
 
     def get_SHD_TOP(self):
-        return self.get_t(self.ser,2)
+        return self.get_t(self.ser2,1)
 
     def get_MAG_TOP(self):
-        return self.get_t(self.ser,3)
+        return self.get_t(self.ser2,2)
 
     def get_MAG_BOT(self):
-        return self.get_t(self.ser,4)
+        return self.get_t(self.ser2,3)
 
     def get_t(self,ser,n):
         input = 'R'+str(n)+'\r'
@@ -43,13 +48,14 @@ class Inst():
         result =str(ser.read(6),'utf-8')
         ser.reset_input_buffer()
 
-        if "?" in result: 
-            return self.get_t(self.ser,n)
+        if len(result) == 0:
+            return 0
+
+        if "?" in result: return self.get_t(ser,n)
         
         temperature = float(result.replace('R','').replace('\r', ''))
 
-        if temperature == 0:
-            return self.get_t(self.ser,n)
+        if temperature == 0:  return self.get_t(ser,n)
         
         return temperature
 

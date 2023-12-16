@@ -91,18 +91,21 @@ class AppServer():
 
                         if pieces[1] == "new_app":
                             #check if the instrument exist
-                            if not self.checkInstrument(pieces[4]): self.errorRequest('no such instrument: '+pieces[4])
-                            #prepare a port for application
-                            port = self.createPort(pieces[2]+'-'+pieces[3]+'-'+pieces[4])   #app_name - serial
+                            if not self.checkInstrument(pieces[4]):
+                                self.errorRequest('no such instrument: '+pieces[4])
+                                client.send( (-1 , -1) )
+                            else:
+                                #prepare a port for application
+                                port = self.createPort(pieces[2]+'-'+pieces[3]+'-'+pieces[4])   #app_name - serial
 
-                            #request instrumentServer to coordinate instrument
-                            commend = "open"
-                            arg = ( ( self.sys.address_inst_app, port) , self.sys.authkey_inst_app)
-                            self.sys.queue_InstServer[pieces[4]].put((commend,arg))
+                                #request instrumentServer to coordinate instrument
+                                commend = "open"
+                                arg = ( ( self.sys.address_inst_app, port) , self.sys.authkey_inst_app)
+                                self.sys.queue_InstServer[pieces[4]].put((commend,arg))
 
-                            #let application know the address , port number, authkey
-                            result = ( (self.sys.address_inst_app , port) 
-                                        , self.sys.authkey_inst_app)
+                                #let application know the address , port number, authkey
+                                result = ( (self.sys.address_inst_app , port) 
+                                            , self.sys.authkey_inst_app)
 
                         elif pieces[1] == "close_app":  #coming from application's destructor
                             #release port
@@ -122,44 +125,6 @@ class AppServer():
             except:
                 pass
 
-
-        while self.sys.status:
-            try:
-                msg = client.recv() #msg in app_request-new_app-app_name-serial(0~10,000)-instrumen_name
-                pieces = msg.split('-')
-                
-                if pieces[0] != "app_request": self.errorRequest(msg)
-
-                if pieces[1] == "new_app":
-                    #check if the instrument exist
-                    if not self.checkInstrument(pieces[4]): self.errorRequest('no such instrument')
-                    #prepare a port for application
-                    port = self.createPort(pieces[2]+'-'+pieces[3]+'-'+pieces[4])   #app_name - serial
-
-                    #request instrumentServer to coordinate instrument
-                    commend = "open"
-                    arg = ( ( self.sys.address_inst_app, port) , self.sys.authkey_inst_app)
-                    self.sys.queue_InstServer[pieces[4]].put((commend,arg))
-
-                    #let application know the address , port number, authkey
-                    client.send(( (self.sys.address_inst_app , port) 
-                                 , self.sys.authkey_inst_app))
-
-                elif pieces[1] == "close_app":  #coming from application's destructor
-                    #release port
-                    ports,insts = self.searchport([pieces[2] , pieces[3]])
-                    self.sys.port_inst_app_available += ports
-                    #tell the instrumentServer
-                    for i in range(len(ports)):
-                        message = ("close",ports[i])
-                        self.sys.queue_InstServer[insts[i]].put(message)
-                        print("release ports:",ports[i],"from instrument: ", insts[i])
-
-                    #let application know the address , port number, authkey
-                    client.send("bye")
-
-            except EOFError:
-                client = port_AppServer.accept()
 
     def searchport(self,name):
         ports = []
@@ -190,6 +155,7 @@ class AppServer():
     def errorRequest(self,msg):
         print("AppServer receive error request:")
         print(msg)
+        return
 
 
 

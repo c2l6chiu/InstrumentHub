@@ -20,6 +20,10 @@ class AppServer():
         
     def addInstrument(self,name):
         address_serviceLine,authkey_serviceLine = self.askPort(name)
+        #no such instrument?
+        if address_serviceLine == -1 and authkey_serviceLine==-1:
+            raise Exception("no such instrument: "+name)
+        
         coordinator = Coordinator(address_serviceLine,authkey_serviceLine)
         self.stack_coordinator.append(coordinator)
         return coordinator

@@ -194,8 +194,7 @@ class Widget(QWidget):
 
         #connect to ITC
         self.app = AppServer("app_Tcontroll")
-        # self.itc = self.app.addInstrument("inst_itcSIM")
-        self.itc = self.app.addInstrument("inst_itcRS232")
+        self.itc = self.app.addInstrument("inst_itc")
 
         #time stamp base (using Labview standard, Easter time)
         self.EPOCH_labview = pd.Timestamp('1904-01-01 0:0:0',tz="UTC").tz_convert('US/Eastern').tz_localize(None)
@@ -286,10 +285,10 @@ class Widget(QWidget):
         try: rate_BOT_rate = (self.T_MAG_BOT[-1] - self.T_MAG_BOT[-pts]) / (self.time_raw[-1] - self.time_raw[-pts])
         except: rate_BOT_rate = 0
 
-        self.ui.lable_1K_rate.setText("{0:.2f}".format(rate_1K/60))
-        self.ui.lable_SHD_TOP_rate.setText("{0:.2f}".format(rate_SHD_TOP/60))
-        self.ui.lable_MAG_TOP_rate.setText("{0:.2f}".format(rate_MAG_TOP/60))
-        self.ui.lable_MAG_BOT_rate.setText("{0:.2f}".format(rate_BOT_rate/60))
+        self.ui.lable_1K_rate.setText("{0:.2f}".format(rate_1K*60))
+        self.ui.lable_SHD_TOP_rate.setText("{0:.2f}".format(rate_SHD_TOP*60))
+        self.ui.lable_MAG_TOP_rate.setText("{0:.2f}".format(rate_MAG_TOP*60))
+        self.ui.lable_MAG_BOT_rate.setText("{0:.2f}".format(rate_BOT_rate*60))
 
         #plot data
         left , right = self.ui.ax.get_xlim()
