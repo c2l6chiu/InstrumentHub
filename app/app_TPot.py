@@ -20,7 +20,10 @@ class Ui_Widget():
         Widget.setObjectName(u"Temperture control")
         Widget.setWindowTitle(Widget.objectName())
         Widget.resize(1000, 600)
+        app_root = os.getcwd()
+        os.chdir("..")
         Widget.setWindowIcon(QIcon(os.getcwd()+"/icon/blue.png"))
+        os.chdir(app_root)
 
         #Plot
         self.canvas = FigureCanvas(Figure())

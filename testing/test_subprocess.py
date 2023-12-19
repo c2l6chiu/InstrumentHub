@@ -1,4 +1,8 @@
 import subprocess
+import os
 
-subprocess.run(f"conda activate {'VFstm'}", shell=True)
+cmd = "start conda activate amoebas && test.py"
+# cmd = "test.py"
+
+subprocess.Popen(cmd, shell=True ,cwd=os.getcwd()+"/testing")
 
