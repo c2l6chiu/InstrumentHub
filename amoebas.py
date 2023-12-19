@@ -64,7 +64,7 @@ while sys.status:
 
     elif commend in ['application' , "app"]:
         print('start app_'+arg[0]+'.py')
-        subprocess.Popen("conda run -n "+sys.env+" python app_"+arg[0]+".py", shell=True, cwd=os.getcwd()+"/app")
+        subprocess.Popen("conda run --no-capture-output -n "+sys.env+" python app_"+arg[0]+".py", shell=True, cwd=os.getcwd()+"/app")
 
 
     elif commend in ['instrument?' , "inst?"]:

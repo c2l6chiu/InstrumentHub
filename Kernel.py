@@ -212,9 +212,12 @@ class BootInstrument():
     def communicate(self):
         boot = Listener((self.sys.address_boot,self.sys.port_boot),
                  authkey= self.sys.authkey_boot)
-        cmd = "conda run -n "+self.sys.env+" python Instrument.py"
+        #this one will show the instrument console (for debugging)
+        cmd = "start conda run --no-capture-output -n "+self.sys.env+" python Instrument.py"
+        #this one will hide instrument console
+        # cmd = "conda run -n "+self.sys.env+" python Instrument.py"
 
-        subprocess.Popen("start "+cmd, shell=True , cwd=os.getcwd()+"/inst")
+        subprocess.Popen(""+cmd, shell=True , cwd=os.getcwd()+"/inst")
         client = boot.accept()
         #send instrument class
         client.send(self.name)

@@ -1,8 +1,11 @@
 import subprocess
 import os
 
-cmd = "start conda activate amoebas && test.py"
-# cmd = "test.py"
+cmd = "start conda run --no-capture-output -n amoebas python test.py"
+# cmd = "start test.py"
 
-subprocess.Popen(cmd, shell=True ,cwd=os.getcwd()+"/testing")
+proc = subprocess.Popen(cmd, shell=True ,cwd=os.getcwd()+"/testing")
+# import time
+# time.sleep(2)
+# proc.terminate()
 
