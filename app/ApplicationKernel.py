@@ -1,5 +1,7 @@
 from multiprocessing.connection import Client
 import random
+
+# import atexit
     
 class AppServer():
     address_AppServer = '127.0.0.1'
@@ -11,6 +13,10 @@ class AppServer():
 
     def __init__(self,name):
         self.app_name = name
+
+    # @atexit.register
+    # def __safety__():
+    #     .__del__()
 
     def __del__(self):
         self.shutdown()
@@ -45,6 +51,10 @@ class AppServer():
     def shutdown(self):
         for coor in self.stack_coordinator:
             coor.shutdown()
+
+    # @atexit.register
+    # def goodbye():
+    #     print('You are now leaving the Python sector.')
 
 
 

@@ -7,3 +7,9 @@ class AppServer():
     port = 5723
 
     app_request-new_app-app_name-serial(0~10,000)-instrumen_name
+
+#environment:
+so I use anoconda to manage versoin, make sure you add anaconda to your path (so
+that you can activate your conda environment in cmd)
+
+

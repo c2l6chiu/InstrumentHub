@@ -193,7 +193,7 @@ class Widget(QWidget):
         super().__init__(parent)
 
         #connect to ITC
-        self.app = AppServer("app_Tcontroll")
+        self.app = AppServer("TPot")
         self.itc = self.app.addInstrument("inst_itc")
 
         #time stamp base (using Labview standard, Easter time)
@@ -533,13 +533,16 @@ def get_darkModePalette( app=None ) :
     darkPalette.setColor( QPalette.Disabled, QPalette.HighlightedText, QColor( 127, 127, 127 ), )
     return darkPalette
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setPalette( get_darkModePalette( app ) )
-    widget = Widget()
-    widget.show()
-    # app.exec()
-    sys.exit(app.exec())
+
+
+
+# if __name__ == "__main__":
+app = QApplication(sys.argv)
+app.setStyle("Fusion")
+app.setPalette( get_darkModePalette( app ) )
+widget = Widget()
+widget.show()
+
+sys.exit(app.exec())
 
 

@@ -7,6 +7,7 @@ from queue import Queue
 class System():
     version = "1.0"
     status = True
+    env = "VFstm"
     n_port_inst_app = 100
     n_port_InstServer = 50
 
@@ -211,7 +212,9 @@ class BootInstrument():
     def communicate(self):
         boot = Listener((self.sys.address_boot,self.sys.port_boot),
                  authkey= self.sys.authkey_boot)
-        subprocess.call('start Instrument.py', shell=True , cwd=os.getcwd()+"/inst")
+        cmd = "conda run -n "+self.sys.env+" python Instrument.py"
+
+        subprocess.Popen(cmd, shell=True , cwd=os.getcwd()+"/inst")
         client = boot.accept()
         #send instrument class
         client.send(self.name)
@@ -230,4 +233,5 @@ class BootInstrument():
         else:
             print("fail booting: "+self.name)
         boot.close()
+
         return status

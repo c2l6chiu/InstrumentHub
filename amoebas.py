@@ -1,3 +1,4 @@
+import os
 from threading import Thread
 from multiprocessing.connection import Listener
 from queue import Queue
@@ -58,23 +59,33 @@ while sys.status:
     commend = peices[0].lower()
     if len(peices) > 1: arg = peices[1:]
 
-    elif commend in ['application?' , "application" , "app" , "app?"]:
+    if commend in ['application?' , "app?"]:
         print(sys.port_inst_app)
 
-    elif commend in ['instrument?' , "instrument" , "inst" , "inst?"]:
+    elif commend in ['application' , "app"]:
+        print('start app_'+arg[0]+'.py')
+        subprocess.Popen("conda run -n "+sys.env+" python app_"+arg[0]+".py", shell=True, cwd=os.getcwd()+"/app")
+
+
+    elif commend in ['instrument?' , "inst?"]:
         print(sys.port_InstServer)
         print(sys.Inst_status)
+
+    elif commend in ['instrument' , "inst"]:
+        boot = BootInstrument(sys,arg[0])
+        boot.boot()
+        del boot
 
     elif commend in ['connection?' , "connection" , "conn" , "conn?"]:
         print(sys.port_inst_app)
 
     elif commend in ["add","boot","start","launch","connect"]:
-        boot = BootInstrument(sys,peices[1])
+        boot = BootInstrument(sys,arg[0])
         boot.boot()
         del boot
 
     elif commend in ["remove"]:
-        sys.kill_InstServ_and_Inst(peices[1])
+        sys.kill_InstServ_and_Inst(arg[0])
 
     elif commend in ["restart","reboot","rrr"]:
         #remove
