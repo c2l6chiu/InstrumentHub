@@ -1,3 +1,6 @@
+cntrl-C process:
+two type of applicatoin: integrated cosole or hidden console
+
 Integrate matlab to here?
 Finish Ardrino / Keithley
 
