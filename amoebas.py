@@ -55,9 +55,12 @@ for name in pre_instrument_list:
 
 while sys.status:
     request = jobs.get()
+    if request == "": continue
+
     peices = request.split(' ')
     commend = peices[0].lower()
     if len(peices) > 1: arg = peices[1:]
+
 
     if commend in ['application?' , "app?"]:
         print(sys.port_inst_app)

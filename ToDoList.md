@@ -1,15 +1,13 @@
-Subprocess:
+Integrate matlab to here?
+Finish Ardrino / Keithley
+
+Subprocess for instrument and application:
     * monitor the child is alive?
     * kill the child
 
 
-Finish Ardrino / Keithley
-
-
-
 Application crash:
-    did the destructor being called correctely?
-    if the communication stuck, how to close the connection?
+    application will do destructor only when application shut down on its own. If the communication stuck, how to close the connection?
 
 
 in application.AppServer.askPort
@@ -33,9 +31,7 @@ In kernel AppServer.checkInstrument
 
 In Kernel deal with bad application connection
     1. attemp to connect to same instrument twice
-    2. application disappear
     3. application froze
-    4. need to be able to force delete the application if it got stuck
 
 
 

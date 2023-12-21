@@ -21,6 +21,9 @@ class Ui_Widget():
         Widget.setWindowTitle(Widget.objectName())
         Widget.resize(1000, 600)
         app_root = os.getcwd()
+        print(os.getcwd)
+        import time
+        time.sleep(5)
         os.chdir("..")
         Widget.setWindowIcon(QIcon(os.getcwd()+"/icon/blue.png"))
         os.chdir(app_root)
