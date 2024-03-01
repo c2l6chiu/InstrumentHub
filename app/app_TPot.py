@@ -1,5 +1,5 @@
 import sys , os
-import datetime
+import datetime, time
 import numpy as np
 import pandas as pd
 
@@ -355,6 +355,8 @@ class Widget(QWidget):
         T_threshold = float(self.ui.lineEdit_threshold.text())
         self.ui.button_refill.setStyleSheet("background-color: red")
         self.ui.button_refill.setText("refilling...")
+        self.itc.query("set_NV("+str(NV)+")")
+        time.sleep(0.2)
         self.itc.query("set_NV("+str(NV)+")")
         self.refill_monitor_on(T_threshold)
 

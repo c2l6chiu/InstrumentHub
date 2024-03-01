@@ -27,9 +27,9 @@ t_instMom = Thread(target=instMom.server,args=())
 t_instMom.start()
 
 #pre-launch Instrument
-pre_instrument_list = ['inst_itc']
+# pre_instrument_list = ['inst_itc']
 # pre_instrument_list = ['inst_dog',"inst_itc","inst_nanonis","inst_nanonisUDP" ]
-# pre_instrument_list = ["inst_nanonis","inst_itc"]
+pre_instrument_list = ["inst_nanonis","inst_itc"]
 
 for name in pre_instrument_list:
     boot = BootInstrument(sys,name)

@@ -56,6 +56,8 @@ class Inst():
         temperature = float(result.replace('R','').replace('\r', ''))
 
         if temperature == 0:  return self.get_t(ser,n)
+
+        if temperature>18: print(result)
         
         return temperature
     
@@ -68,7 +70,7 @@ class Inst():
 
         if len(result) == 0:
             return 0
-        
+
         temperature = float(result.replace('R','').replace('\r', ''))
 
         return temperature
@@ -89,9 +91,8 @@ class Inst():
             raise Exception('open needle valve too much')
         input = 'G0{:3.1f}\r'.format(float(amount))
         self.ser.write(input.encode())
-        time.sleep(0.5)
-        self.ser.write(input.encode())  #in case it doens't send
-        self.ser.reset_input_buffer()
+        # print("set_NV to "+str(amount))
+        time.sleep(0.1)
         self.local()
         self.NV = amount
 
