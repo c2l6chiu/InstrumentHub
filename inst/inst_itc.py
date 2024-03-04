@@ -43,23 +43,22 @@ class Inst():
 
     def get_t(self,ser,n):
         input = 'R'+str(n)+'\r'
+
         ser.write(input.encode())
         time.sleep(0.1)
         result =str(ser.read(6),'utf-8')
         ser.reset_input_buffer()
-
+        
         if len(result) == 0:
             return 0
 
         if "?" in result: return self.get_t(ser,n)
+        if 'R' not in result: return self.get_t(ser,n)
         
         temperature = float(result.replace('R','').replace('\r', ''))
 
-        if temperature == 0:  return self.get_t(ser,n)
-
-        if temperature>18: print(result)
-        
-        return temperature
+        if temperature < 1 or temperature > 401:  return self.get_t(ser,n)
+        else: return temperature
     
     def must_get_t(self,ser,n):
         input = 'R'+str(n)+'\r'
@@ -90,9 +89,14 @@ class Inst():
         if amount > 50:
             raise Exception('open needle valve too much')
         input = 'G0{:3.1f}\r'.format(float(amount))
+
+        self.ser.reset_input_buffer()
         self.ser.write(input.encode())
-        # print("set_NV to "+str(amount))
         time.sleep(0.1)
+        self.ser.reset_input_buffer()
+        self.ser.write(input.encode())
+        time.sleep(0.1)
+
         self.local()
         self.NV = amount
 
@@ -101,9 +105,15 @@ class Inst():
         self.ser.write(b'C3\r')
         time.sleep(0.1)
         self.ser.reset_input_buffer()
+        self.ser.write(b'C3\r')
+        time.sleep(0.1)
+        self.ser.reset_input_buffer()
         # self.ser.close()
     def local(self):
         # self.ser.open()
+        self.ser.write(b'C0\r')
+        time.sleep(0.1)
+        self.ser.reset_input_buffer()
         self.ser.write(b'C0\r')
         time.sleep(0.1)
         self.ser.reset_input_buffer()
