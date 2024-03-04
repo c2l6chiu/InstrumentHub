@@ -356,8 +356,6 @@ class Widget(QWidget):
         self.ui.button_refill.setStyleSheet("background-color: red")
         self.ui.button_refill.setText("refilling...")
         self.itc.query("set_NV("+str(NV)+")")
-        time.sleep(0.2)
-        self.itc.query("set_NV("+str(NV)+")")
         self.refill_monitor_on(T_threshold)
 
         self.updateMessage("refilling 1K pot NV="+str(NV)+" threshold= "+"{0:.4f}".format(T_threshold))

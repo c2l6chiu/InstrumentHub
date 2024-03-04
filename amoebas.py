@@ -6,10 +6,15 @@ import subprocess
 from Kernel import System,Shell,AppServer,InstrumentMom,InstrumentServer,BootInstrument
 import time
 
-jobs = Queue()
 
-#the system that store all the inforamtion
-sys = System()
+pre_instrument_list = [('inst_dog' , False),\
+                        ('inst_itc' , True),\
+                        ('inst_nanonis' , False),\
+                        ('inst_arduino' , True)]
+
+
+jobs = Queue()          #for shell to pass on commend
+sys = System()          #the system that store all the inforamtion
 
 #generate shell
 shell = Shell(jobs,sys)
@@ -27,30 +32,7 @@ t_instMom = Thread(target=instMom.server,args=())
 t_instMom.start()
 
 #pre-launch Instrument
-pre_instrument_list = ['inst_itc']
-# pre_instrument_list = ['inst_dog',"inst_itc","inst_nanonis","inst_nanonisUDP" ]
-# pre_instrument_list = ["inst_nanonis","inst_itc"]
-
-for name in pre_instrument_list:
-    boot = BootInstrument(sys,name)
-    boot.boot()
-    del boot
-    # sys.queue_InstServer[name] = Queue()
-    # sys.port_InstServer[name] = sys.port_InstServer_available.pop()
-    # #laucn new interpreter
-    # launch = BootInstrument(sys,name)
-    # status = launch.boot()
-    # if status == "failed":
-    #     del sys.queue_InstServer[name]
-    #     sys.port_InstServer_available.append(sys.port_InstServer[name])
-    #     del sys.port_InstServer[name]
-    # else:
-    #     instServer = InstrumentServer(sys,name)
-    #     sys.Inst_status[name] = True
-    #     #create/store thread
-    #     t_instServer = Thread(target=instServer.server,args=())
-    #     sys.InstServer_thread_pool[name] = t_instServer
-    #     t_instServer.start()
+sys.start_inst(pre_list=pre_instrument_list , debugMode=False)  
 
 
 while sys.status:
@@ -64,10 +46,6 @@ while sys.status:
 
     if commend in ['application?' , "app?"]:
         print(sys.port_inst_app)
-
-    elif commend in ['application' , "app"]:
-        print('start app_'+arg[0]+'.py')
-        subprocess.Popen("conda run --no-capture-output -n "+sys.env+" python app_"+arg[0]+".py", shell=True, cwd=os.getcwd()+"/app")
 
 
     elif commend in ['instrument?' , "inst?"]:
@@ -83,12 +61,14 @@ while sys.status:
         print(sys.port_inst_app)
 
     elif commend in ["add","boot","start","launch","connect"]:
-        boot = BootInstrument(sys,arg[0])
+        boot = BootInstrument(sys,arg[0],debugMode=True)
         boot.boot()
         del boot
 
     elif commend in ["remove"]:
         sys.kill_InstServ_and_Inst(arg[0])
+
+
 
     elif commend in ["restart","reboot","rrr"]:
         #remove
@@ -97,18 +77,29 @@ while sys.status:
             sys.kill_InstServ_and_Inst(i)
         # restart
         time.sleep(1)
-        for name in pre_instrument_list:
-            boot = BootInstrument(sys,name)
-            boot.boot()
-            del boot        
+        sys.start_inst(pre_list=pre_instrument_list , debugMode=False)     
 
-    elif commend in ['exit',"quit","stop","exit()" ]:
-        sys.status = False  #this will shut down AppServer, shell
-        inst = []
-        for ser in sys.InstServer_thread_pool:
-            inst.append(ser)
-        for ser in inst:
-            sys.kill_InstServ_and_Inst(ser)
+    elif commend in ["debug"]:
+        #remove
+        inst_to_kill = list(sys.port_InstServer.keys())
+        for i in inst_to_kill[:]:
+            sys.kill_InstServ_and_Inst(i)
+        # restart
+        time.sleep(1)
+        sys.start_inst(pre_list=pre_instrument_list , debugMode=True)     
+
+    # elif commend in ['exit',"quit","stop","exit()" ]:
+    #     sys.status = False  #this will shut down AppServer, shell
+    #     inst = []
+    #     for ser in sys.InstServer_thread_pool:
+    #         inst.append(ser)
+    #     for ser in inst:
+    #         sys.kill_InstServ_and_Inst(ser)
 
     else:
-        print("commend not found")
+        if os.path.exists(os.getcwd()+"/app/"+commend+".py"):
+            subprocess.Popen("conda run --no-capture-output -n "+sys.env+" python "+commend+".py", shell=True, cwd=os.getcwd()+"/app")
+            print('starting '+commend+'.py......')
+        else:
+            print("commend not found")
+        

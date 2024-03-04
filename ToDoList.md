@@ -1,3 +1,5 @@
+Making the CMD console easier to use
+
 cntrl-C process:
 two type of applicatoin: integrated cosole or hidden console
 

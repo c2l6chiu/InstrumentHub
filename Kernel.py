@@ -5,11 +5,12 @@ import subprocess
 from queue import Queue
 
 class System():
-    version = "1.0"
+    version = "1.1 Mar2024"
     status = True
     env = "amoebas"
     n_port_inst_app = 100
     n_port_InstServer = 50
+    inst_list = []
 
     #AppServer
     address_AppServer = '127.0.0.1'
@@ -39,9 +40,8 @@ class System():
     authkey_inst_app = b'vf@pnml9876'
 
 
-
     def __init__(self):
-        pass
+        self.load_inst_list()
 
     # def __del__(self):
         # self.status = False  #this will shut down AppServer, shell
@@ -51,24 +51,46 @@ class System():
         # for ser in inst:
         #     self.kill_InstServ_and_Inst(ser)
 
+    def load_inst_list(self):
+        for file in os.listdir(os.getcwd()+'/inst'):
+            if 'inst_' in file:
+                self.inst_list.append(file.strip('.py'))
+
+    def start_inst(self,pre_list=[('','')],debugMode=False):
+        status = dict(pre_list)
+        self.print_seperator()
+        for inst in self.inst_list:
+            if inst in status and status[inst] == False:
+                print(inst + ": skipped")
+            else:
+                boot = BootInstrument(self,inst,debugMode=debugMode)
+                boot.boot()
+                del boot
+        self.print_seperator()
+
     def kill_InstServ_and_Inst(self,name):
         self.queue_InstServer[name].put(("kill",0))
         port = self.port_InstServer[name]
         del self.port_InstServer[name]
         self.port_InstServer_available.append(port)
 
+    def print_seperator(self):
+        print("==============================")
+
 class Shell():
     def __init__(self,jobs,sys):
         self.jobs = jobs
         self.sys = sys
-        print(sys.version)
+        sys.print_seperator()
+        print('Amoebas version: '+sys.version)
+        sys.print_seperator()
         
 
     def run(self):
         while self.sys.status:
             data = str(input())
             self.jobs.put(data)
-            if data in ['exit',"quit","stop","exit()" ]: break
+            # if data in ['exit',"quit","stop","exit()" ]: break
 
 
 class AppServer():
@@ -188,9 +210,10 @@ class InstrumentServer():
         print("InstrumentServer: ",self.name, " off")
 
 class BootInstrument():
-    def __init__(self,sys,name):
+    def __init__(self,sys,name,debugMode=False):
         self.sys = sys
         self.name = name
+        self.debugMode = debugMode
 
     def boot(self):
         self.sys.queue_InstServer[self.name] = Queue()
@@ -212,10 +235,12 @@ class BootInstrument():
     def communicate(self):
         boot = Listener((self.sys.address_boot,self.sys.port_boot),
                  authkey= self.sys.authkey_boot)
-        #this one will show the instrument console (for debugging)
-        cmd = "start conda run --no-capture-output -n "+self.sys.env+" python Instrument.py"
-        #this one will hide instrument console
-        # cmd = "conda run -n "+self.sys.env+" python Instrument.py"
+        if self.debugMode:
+            #this one will show the instrument console (for debugging)
+            cmd = "start conda run --no-capture-output -n "+self.sys.env+" python Instrument.py"
+        else:
+            #this one will hide instrument console
+            cmd = "conda run -n "+self.sys.env+" python Instrument.py"
 
         subprocess.Popen(""+cmd, shell=True , cwd=os.getcwd()+"/inst")
         client = boot.accept()
@@ -232,9 +257,9 @@ class BootInstrument():
         client.send(msg)
         status = client.recv()
         if status == "success":
-            print("booted successfully: "+self.name)
+            print(self.name + ": booted successfully")
         else:
-            print("fail booting: "+self.name)
+            print(self.name + ": fail booting")
         boot.close()
 
         return status

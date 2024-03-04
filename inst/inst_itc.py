@@ -48,7 +48,7 @@ class Inst():
         time.sleep(0.1)
         result =str(ser.read(6),'utf-8')
         ser.reset_input_buffer()
-        
+
         if len(result) == 0:
             return 0
 
@@ -85,39 +85,35 @@ class Inst():
         # return NV
     
     def set_NV(self, amount):
-        self.remote()
         if amount > 50:
             raise Exception('open needle valve too much')
         input = 'G0{:3.1f}\r'.format(float(amount))
 
+        self.remote()
         self.ser.reset_input_buffer()
         self.ser.write(input.encode())
-        time.sleep(0.1)
-        self.ser.reset_input_buffer()
-        self.ser.write(input.encode())
-        time.sleep(0.1)
-
         self.local()
+        time.sleep(0.1)
+        self.remote()
+        self.ser.reset_input_buffer()
+        self.ser.write(input.encode())
+        self.local()
+        self.remote()
+        self.ser.reset_input_buffer()
+        self.ser.write(input.encode())
+        self.local()
+
         self.NV = amount
 
     def remote(self):
-        # self.ser.open()
         self.ser.write(b'C3\r')
         time.sleep(0.1)
         self.ser.reset_input_buffer()
-        self.ser.write(b'C3\r')
-        time.sleep(0.1)
-        self.ser.reset_input_buffer()
-        # self.ser.close()
+
     def local(self):
-        # self.ser.open()
         self.ser.write(b'C0\r')
         time.sleep(0.1)
         self.ser.reset_input_buffer()
-        self.ser.write(b'C0\r')
-        time.sleep(0.1)
-        self.ser.reset_input_buffer()
-        # self.ser.close()
 
 # 0 : Local and locked
 # 1 : Remote and locked
