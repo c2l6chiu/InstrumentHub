@@ -41,7 +41,9 @@ class System():
 
 
     def __init__(self):
+        # os.chdir(r'C:\Users\VFSTM-PC3\Documents\InstrumentHub\InstrumentHub')
         self.load_inst_list()
+
 
     # def __del__(self):
         # self.status = False  #this will shut down AppServer, shell

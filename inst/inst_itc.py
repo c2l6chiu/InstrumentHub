@@ -23,7 +23,8 @@ class Inst():
         # self.NV = float(result.replace('R+','').replace('\r', ''))
 
     def __del__(self):
-        self.close()
+        self.local()
+        self.ser.close()
 
     # def close(self):
     #     self.ser.close
