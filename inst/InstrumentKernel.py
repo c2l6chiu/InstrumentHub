@@ -20,16 +20,22 @@ class ServiceLine():
         print("detach from port: "+str(self.port))
 
     def run(self):
-        self.port_inst_app = Listener(self.address , authkey= self.authkey_serviceLine)
+        self.port_inst_app = Listener(self.address)
         self.port_inst_app._listener._socket.settimeout(time_out)
         while self.status:
             try:
                 client = self.port_inst_app.accept()
                 while self.status:
                     try:
-                        msg = client.recv()
-                        self.que_command.put((self.port,msg))
-                        client.send(self.que_respond.get())
+                        msg = client.recv_bytes()
+                        self.que_command.put((self.port,str(msg,'utf-8')))
+                        result = self.que_respond.get()
+                        if type(result) == str: pack = b's'+str(result).encode()
+                        elif type(result) == int: pack = b'i'+str(result).encode()
+                        elif type(result) == float: pack = b'f'+str(result).encode()
+                        else: pack = b's'+str(result).encode()
+
+                        client.send_bytes(pack)
                     except EOFError:
                         self.shutdown()
             except: #TimeoutError

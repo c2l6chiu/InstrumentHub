@@ -100,8 +100,7 @@ class AppServer():
         self.sys = sys
 
     def server(self):
-        port_AppServer = Listener((self.sys.address_AppServer,self.sys.port_AppServer) , 
-                                  authkey= self.sys.authkey_AppServer)
+        port_AppServer = Listener((self.sys.address_AppServer,self.sys.port_AppServer))
         port_AppServer._listener._socket.settimeout(1)
 
         while self.sys.status:
@@ -109,7 +108,7 @@ class AppServer():
                 client = port_AppServer.accept()
                 while self.sys.status:
                     try:
-                        msg = client.recv() #msg in app_request-new_app-app_name-serial(0~10,000)-instrumen_name
+                        msg = str(client.recv_bytes() , 'utf-8') #msg in app_request-new_app-app_name-serial(0~10,000)-instrumen_name
                         pieces = msg.split('-')
                         
                         if pieces[0] != "app_request": self.errorRequest(msg)
@@ -118,7 +117,7 @@ class AppServer():
                             #check if the instrument exist
                             if not self.checkInstrument(pieces[4]):
                                 self.errorRequest('no such instrument: '+pieces[4])
-                                client.send( (-1 , -1) )
+                                result = b"!!!-!!!-!!!"     #address, port, authkey
                             else:
                                 #prepare a port for application
                                 port = self.createPort(pieces[2]+'-'+pieces[3]+'-'+pieces[4])   #app_name - serial
@@ -129,8 +128,7 @@ class AppServer():
                                 self.sys.queue_InstServer[pieces[4]].put((commend,arg))
 
                                 #let application know the address , port number, authkey
-                                result = ( (self.sys.address_inst_app , port) 
-                                            , self.sys.authkey_inst_app)
+                                result = ( str(self.sys.address_inst_app) +'-'+ str(port) +'-'+ str(self.sys.authkey_inst_app) ).encode()
 
                         elif pieces[1] == "close_app":  #coming from application's destructor
                             #release port
@@ -143,8 +141,8 @@ class AppServer():
                                 print("release ports:",ports[i],"from instrument: ", insts[i])
 
                             #let application know the address , port number, authkey
-                            result = "bye"
-                        client.send(result)
+                            result = b"bye"
+                        client.send_bytes(result)
                     except EOFError:
                         client = port_AppServer.accept()
             except:

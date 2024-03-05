@@ -10,7 +10,8 @@ import time
 pre_instrument_list = [('inst_dog' , False),\
                         ('inst_itc' , True),\
                         ('inst_nanonis' , False),\
-                        ('inst_arduino' , True)]
+                        ('inst_arduino' , False),\
+                        ('inst_SR860' , False)]
 
 
 jobs = Queue()          #for shell to pass on commend

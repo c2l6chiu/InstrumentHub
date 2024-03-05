@@ -22,11 +22,11 @@ address_AppServer = '127.0.0.1'
 port_AppServer = 8192
 authkey_AppServer = b'vf@pnml1234'
 
-port_AppServer = Listener((address_AppServer,port_AppServer) , 
-                                  authkey= authkey_AppServer)
+port_AppServer = Listener((address_AppServer,port_AppServer))
 # port_AppServer._listener._socket.settimeout(1)
 
 client = port_AppServer.accept()
 print('get something')
-msg = client.recv_bytes()
-print(msg)
+# msg = client.recv_bytes()
+# print(msg)
+client.send_bytes(b'f123')

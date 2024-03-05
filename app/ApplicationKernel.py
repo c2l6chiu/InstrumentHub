@@ -21,12 +21,12 @@ class AppServer():
         self.ask(message)
         
     def addInstrument(self,name):
-        address_serviceLine,authkey_serviceLine = self.askPort(name)
+        address_serviceLine = self.askPort(name)
         #no such instrument?
-        if address_serviceLine == -1 and authkey_serviceLine==-1:
+        if address_serviceLine == ('!!!','!!!'):
             raise Exception("no such instrument: "+name)
         
-        coordinator = Coordinator(address_serviceLine,authkey_serviceLine)
+        coordinator = Coordinator(address_serviceLine)
         self.stack_coordinator.append(coordinator)
         return coordinator
 
@@ -34,13 +34,17 @@ class AppServer():
         message = "app_request-new_app"
         message += '-'+self.app_name+'-'+self.serial_number
         message += '-'+inst_name
-        return self.ask(message)
+        result = self.ask(message).split('-')
+        return (result[0],int(result[1]))
+        # return ((result[0],int(result[1])),result[2])     if you want to do authentication
     
     def ask(self,message):
-        port_app_kern =  Client((self.address_AppServer,self.port_AppServer),
-                                authkey=self.authkey_AppServer)
-        port_app_kern.send(message)
-        info = port_app_kern.recv()
+        '''
+        low level communication, return string
+        '''
+        port_app_kern =  Client((self.address_AppServer,self.port_AppServer))
+        port_app_kern.send_bytes(message.encode())
+        info = str(port_app_kern.recv_bytes() , 'utf-8')
         port_app_kern.close()
         return info
     
@@ -57,22 +61,29 @@ class AppServer():
 
 
 class Coordinator():
-    def __init__(self,link_address,authkey):
-        self.port_app_inst= Client(link_address, authkey=authkey)
+    def __init__(self,link_address):
+        self.port_app_inst= Client(link_address)
     
     def shutdown(self):
         self.port_app_inst.close()
 
     def query(self,question):
         #working on the timeout issue
-        self.port_app_inst.send(question)
-        answer = self.port_app_inst.recv()
-        if answer == "error!@#":
+        self.port_app_inst.send_bytes(question.encode())
+        answer = str(self.port_app_inst.recv_bytes(),'utf-8')
+        typ , result = (answer[0] , answer[1:])
+
+        if typ == 's': result = result
+        elif typ == 'i': result = int(result)
+        elif typ == 'f': result = float(result)
+        else: result = result
+
+        if result == "error!@#":
             print("*******************")
             print("error commend: "+ question)
             print("*******************")
             raise
-        return answer
+        return result
     
     # def set(self,question):
     #     pass

@@ -3,12 +3,12 @@
 # # subprocess.Popen("conda run -n VFstm python "+os.getcwd()+"/app/app_Tpot.py", shell=True)
 
 
-# from ApplicationKernel import AppServer
+from ApplicationKernel import AppServer
 
-# app = AppServer("TPot")
-# itc = app.addInstrument("inst_itc")
+app = AppServer("TPot")
+itc = app.addInstrument("inst_itc")
 
-# print(itc.query("get_1K()"))
+print(itc.query("get_1K()"))
 
 # for i in range(100):
 #     result = itc.query("get_1K()")
@@ -25,10 +25,10 @@
 
 
 
-from ApplicationKernel import AppServer
+# from ApplicationKernel import AppServer
 
-app = AppServer("TPot")
-SR = app.addInstrument('inst_SR860')
+# app = AppServer("TPot")
+# SR = app.addInstrument('inst_SR860')
 
-print(SR.query("harm('1')"))
-print(SR.query("harm_q()"))
+# print(SR.query("harm('1')"))
+# print(SR.query("harm_q()"))
