@@ -9,10 +9,13 @@ class Inst():
                       '30ms','100ms','300ms','1s','3s','10s','30s','100s','300s',\
                         '1000s','3000s']
         
-        rm = pyvisa.ResourceManager()
-        rm.list_resources()
+        self.rm = pyvisa.ResourceManager()
+        self.rm.list_resources()
         
-        self.inst = rm.open_resource('TCPIP0::10.0.0.4::inst0::INSTR')
+        self.inst = self.rm.open_resource('TCPIP0::10.0.0.4::inst0::INSTR')
+
+    def __del__(self):
+        self.rm.close()
 
     def sens(self,level):
         sen = self.sen_dic.index(level) if level in self.sen_dic else 0
