@@ -1,12 +1,17 @@
-import numpy as np
-import pandas as pd
+import telnetlib
 
-a = np.empty((5,3))
-# print(a)
+HOST = '10.0.0.4'
 
-a[0,:] = [1,2,3]
-# a = np.append(a,[1,2,3,4,5])
-print(a)
-j=1
-np.savetxt("C:\\Users\\VFSTM-PC3\\Documents\\InstrumentHub\\InstrumentHub\\data\\data{0}.csv".format(j), a, delimiter=",")
+tn = telnetlib.Telnet(HOST)
+# tn.open()
+# print(tn.read_until(b'\r\n'))
+# print('cool')
+# tn.write(b'OFLT 6\r\n')
+# print('ok')
+# tn.write(b'SLVL 0.01\r\n')
 
+# print(int(tn.read_some()))
+# print(tn.read_until(b'\r',timeout=0.1))
+print(tn.read_some())
+
+tn.close()

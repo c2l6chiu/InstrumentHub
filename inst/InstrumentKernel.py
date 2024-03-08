@@ -56,7 +56,7 @@ class InstrumentController():
             except Exception as eer:
                 # print(eer)
                 print("error commend: "+commend)
-                self.queue_respond[port].put("error!@#")
+                self.queue_respond[port].put("error!@#"+str(eer))
 
 
 

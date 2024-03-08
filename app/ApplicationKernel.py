@@ -67,7 +67,10 @@ class Coordinator():
     def shutdown(self):
         self.port_app_inst.close()
 
-    def query(self,question):
+    def query_old(self,question):
+        '''
+        old style: query_old(func('arg1','arg2'))
+        '''
         #working on the timeout issue
         self.port_app_inst.send_bytes(question.encode())
         answer = str(self.port_app_inst.recv_bytes(),'utf-8')
@@ -84,6 +87,31 @@ class Coordinator():
             print("*******************")
             raise
         return result
+    
+    def query(self,func,*arg):
+        '''
+        new style: query(func,arg1,arg2)
+        but also take old style query
+        '''
+        if len(arg) == 0 and func[-1] == ')': question = func
+        else: question = func + '(' + ','.join(["'"+str(iarg)+"'" for iarg in arg]) + ')'
+
+        self.port_app_inst.send_bytes(question.encode())
+        answer = str(self.port_app_inst.recv_bytes(),'utf-8')
+        typ , result = (answer[0] , answer[1:])
+
+        if typ == 's': result = result
+        elif typ == 'i': result = int(result)
+        elif typ == 'f': result = float(result)
+        else: result = result
+
+        if typ == 's' and "error!@#" in result:
+            print("*******************")
+            print("error commend: "+ question)
+            print(result)
+            print("*******************")
+            raise
+        return result        
     
     # def set(self,question):
     #     pass

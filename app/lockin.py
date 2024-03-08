@@ -205,7 +205,7 @@ class Widget(QWidget):
         self.ui.connectUi(self)
 
         self.settingTimer = QTimer()
-        self.settingTimer.setInterval(5000)
+        self.settingTimer.setInterval(10000)
         self.settingTimer.timeout.connect(self.update)
         self.settingTimer.start()
 
@@ -217,83 +217,83 @@ class Widget(QWidget):
 
     @Slot()
     def preset_zero_click(self):
-        self.inst_SR860.query('osc(0)')
-        self.inst_SR860.query('sens("1V")')
+        self.inst_SR860.query('osc',0)
+        self.inst_SR860.query('sens','1V')
         self.update()
 
     @Slot()
     def preset_two_click(self):
-        self.inst_SR860.query('osc(2)')
-        self.inst_SR860.query('sens("1V")')
-        self.update()
+        self.inst_SR860.query('osc',2)
+        self.inst_SR860.query('sens','1V')
+        self.update([0,1,2])
         
     @Slot()
     def preset_one_click(self):
-        self.inst_SR860.query('osc(0.1)')
-        self.inst_SR860.query('sens("1V")')
-        self.update()
+        self.inst_SR860.query('osc',0.1)
+        self.inst_SR860.query('sens','1V')
+        self.update([0,1,2])
 
     @Slot()
     def preset_pointTwo_click(self):
-        self.inst_SR860.query('osc(0.02)')
-        self.inst_SR860.query('sens("20mV")')
-        self.update()
+        self.inst_SR860.query('osc',0.02)
+        self.inst_SR860.query('sens','20mV')
+        self.update([0,1,2])
 
     @Slot()
     def osc_enter_click(self):
         osc = float(self.ui.osc_input.text())
         if osc>2: return
-        self.inst_SR860.query('osc('+str(osc)+')')
-        self.update()
+        self.inst_SR860.query('osc',osc)
+        self.update([0])
 
     @Slot()
     def osc_preset_click(self):
-        self.inst_SR860.query('osc(0.02)')
-        self.update()
+        self.inst_SR860.query('osc',0.02)
+        self.update([0])
         
     @Slot()
     def sens_enter_click(self):
         sens = self.ui.sen_dic[self.ui.sens_input.currentIndex()]
-        self.inst_SR860.query("sens('"+sens+"')")
-        self.update()
+        self.inst_SR860.query("sens",sens)
+        self.update([1])
 
     @Slot()
     def sens_preset_click(self):
-        self.inst_SR860.query("sens('20mV')")
-        self.update()
+        self.inst_SR860.query("sens",'20mV')
+        self.update([1])
         
     @Slot()
     def tconst_enter_click(self):
         tconst = self.ui.tconst_dic[self.ui.tconst_input.currentIndex()]
-        self.inst_SR860.query("tconst('"+tconst+"')")
-        self.update()
+        self.inst_SR860.query("tconst",tconst)
+        self.update([2])
 
     @Slot()
     def tconst_preset_click(self):
-        self.inst_SR860.query("tconst('1ms')")
-        self.update()
+        self.inst_SR860.query("tconst","1ms")
+        self.update([2])
         
     @Slot()
     def freq_enter_click(self):
         freq = float(self.ui.freq_input.text())
-        self.inst_SR860.query('freq('+str(freq)+')')
-        self.update()
+        self.inst_SR860.query('freq',freq)
+        self.update([3])
 
     @Slot()
     def freq_preset_click(self):
-        self.inst_SR860.query('freq(4000)')
-        self.update()
+        self.inst_SR860.query('freq',4000)
+        self.update([3])
         
     @Slot()
     def phi_enter_click(self):
         phi = float(self.ui.phi_input.text())
-        self.inst_SR860.query('phi('+str(phi)+')')
-        self.update()
+        self.inst_SR860.query('phi',phi)
+        self.update([4])
 
     @Slot()
     def phi_preset_click(self):  
-        self.inst_SR860.query('phi(-62)')
-        self.update()
+        self.inst_SR860.query('phi',-62)
+        self.update([4])
         
     @Slot()
     def read_all_click(self):
@@ -309,20 +309,25 @@ class Widget(QWidget):
 
     @Slot()
     def adv_autoPhase_click(self):
-        self.inst_SR860.query('autoPhase()')
-        self.update()
+        self.inst_SR860.query('autoPhase')
+        self.update([4])
 
-    def update(self):
-        osc = float(self.inst_SR860.query("osc_q()"))
-        sens = self.inst_SR860.query("sens_q()")
-        tconst = self.inst_SR860.query("tconst_q()")
-        freq = float(self.inst_SR860.query("freq_q()"))
-        phi = float(self.inst_SR860.query("phi_q()"))
-        self.ui.osc_display.setText("{0:.2f}".format(osc))
-        self.ui.sens_display.setText(sens)
-        self.ui.tconst_display.setText(tconst)
-        self.ui.freq_display.setText("{0:.2f}".format(freq))
-        self.ui.phi_display.setText("{0:.2f}".format(phi))
+    def update(self,list=[0,1,2,3,4]):
+        if 0 in list:
+            osc = self.inst_SR860.query("osc_q")
+            self.ui.osc_display.setText("{0:.2f}".format(osc))
+        if 1 in list:
+            sens = self.inst_SR860.query("sens_q")
+            self.ui.sens_display.setText(sens)
+        if 2 in list:
+            tconst = self.inst_SR860.query("tconst_q")
+            self.ui.tconst_display.setText(tconst)
+        if 3 in list:
+            freq = self.inst_SR860.query("freq_q")
+            self.ui.freq_display.setText("{0:.2f}".format(freq))
+        if 4 in list:
+            phi = self.inst_SR860.query("phi_q")
+            self.ui.phi_display.setText("{0:.2f}".format(phi))
 
 
 

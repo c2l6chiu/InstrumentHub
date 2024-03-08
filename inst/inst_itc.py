@@ -23,7 +23,10 @@ class Inst():
         # self.NV = float(result.replace('R+','').replace('\r', ''))
 
     def __del__(self):
-        self.local()
+        try:
+            self.local()
+        except:
+            pass
         self.ser.close()
 
     # def close(self):
@@ -86,7 +89,7 @@ class Inst():
         # return NV
     
     def set_NV(self, amount):
-        if amount > 50:
+        if float(amount) > 50:
             raise Exception('open needle valve too much')
         input = 'G0{:3.1f}\r'.format(float(amount))
 

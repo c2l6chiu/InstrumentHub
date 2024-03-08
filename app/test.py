@@ -7,8 +7,10 @@ from ApplicationKernel import AppServer
 
 app = AppServer("TPot")
 itc = app.addInstrument("inst_itc")
+SR = app.addInstrument('inst_SR860')
 
-print(itc.query("get_1K()"))
+print(itc.query("get_1K"))
+SR.query('osc',0.0)
 
 # for i in range(100):
 #     result = itc.query("get_1K()")

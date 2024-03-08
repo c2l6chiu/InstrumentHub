@@ -323,10 +323,10 @@ class Widget(QWidget):
 
     def measure(self):
         #save data into file only, won't update self.T,self.t
-        T_1K = self.itc.query("get_1K()") if self.ui.checkBox_1K.isChecked() else 0.
-        T_SHD_TOP = self.itc.query("get_SHD_TOP()") if self.ui.checkBox_SHD_TOP.isChecked() else 0.
-        T_MAG_TOP = self.itc.query("get_MAG_TOP()") if self.ui.checkBox_MAG_TOP.isChecked() else 0.
-        T_MAG_BOT = self.itc.query("get_MAG_BOT()") if self.ui.checkBox_MAG_BOT.isChecked() else 0.
+        T_1K = self.itc.query("get_1K") if self.ui.checkBox_1K.isChecked() else 0.
+        T_SHD_TOP = self.itc.query("get_SHD_TOP") if self.ui.checkBox_SHD_TOP.isChecked() else 0.
+        T_MAG_TOP = self.itc.query("get_MAG_TOP") if self.ui.checkBox_MAG_TOP.isChecked() else 0.
+        T_MAG_BOT = self.itc.query("get_MAG_BOT") if self.ui.checkBox_MAG_BOT.isChecked() else 0.
         time_now = pd.Timestamp.now()-self.EPOCH_labview
         time_now = int(time_now.total_seconds())
         today_date = datetime.date.today()
@@ -353,7 +353,7 @@ class Widget(QWidget):
         T_threshold = float(self.ui.lineEdit_threshold.text())
         self.ui.button_refill.setStyleSheet("background-color: red")
         self.ui.button_refill.setText("refilling...")
-        self.itc.query("set_NV("+str(NV)+")")
+        self.itc.query("set_NV",str(NV))
         self.refill_monitor_on(T_threshold)
 
         self.updateMessage("refilling 1K pot NV="+str(NV)+" threshold= "+"{0:.4f}".format(T_threshold))
@@ -366,7 +366,7 @@ class Widget(QWidget):
         self.ui.button_refill.setStyleSheet("background-color: rgb(53, 53, 53)")
         self.ui.button_refill.setText("refill now")
         self.refill_monitor_off()
-        self.itc.query("set_NV(0)")
+        self.itc.query("set_NV",0)
 
         self.updateMessage("stop filling NV=0")
         self.updateMessage("pot monitor off")
@@ -377,7 +377,7 @@ class Widget(QWidget):
         #check if this is refilling from empty pot
         time_gap = pd.Timedelta(seconds=5)
         time_now = pd.Timestamp.now()
-        T1K_now = self.itc.query("get_1K()") if time_now-self.mostCurrentTime > time_gap else self.mostCurrentT_1K
+        T1K_now = self.itc.query("get_1K") if time_now-self.mostCurrentTime > time_gap else self.mostCurrentT_1K
 
         if T1K_now > self.potFullT-0.01:
             self.initail_cool = True
@@ -394,7 +394,7 @@ class Widget(QWidget):
     def refill_monitor(self):
         time_gap = pd.Timedelta(seconds=20)
         time_now = pd.Timestamp.now()
-        T1K_now = self.itc.query("get_1K()") if time_now-self.mostCurrentTime > time_gap else self.mostCurrentT_1K
+        T1K_now = self.itc.query("get_1K") if time_now-self.mostCurrentTime > time_gap else self.mostCurrentT_1K
         if self.initail_cool and T1K_now < self.potFullT-0.01:
             self.updateMessage("temperature drop below threshold, start refill monitor")
             self.initail_cool = False
@@ -498,7 +498,7 @@ class Widget(QWidget):
     @Slot()
     def setNV(self):
         self.updateMessage("set_NV("+self.ui.lineEdit_setTo.text()+")")
-        self.itc.query("set_NV("+self.ui.lineEdit_setTo.text()+")")
+        self.itc.query("set_NV",self.ui.lineEdit_setTo.text())
         if self.refill_state:
             self.refill_state = False
             self.ui.button_refill.setStyleSheet("background-color: rgb(53, 53, 53)")
@@ -509,7 +509,7 @@ class Widget(QWidget):
     @Slot()
     def closeNV(self):
         self.updateMessage("close NV")
-        self.itc.query("set_NV(0)")
+        self.itc.query("set_NV",0)
         if self.refill_state: self.stop_fill_pot()
 
 
