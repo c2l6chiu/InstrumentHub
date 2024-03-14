@@ -24,12 +24,11 @@ class Inst():
 ############  read_channel  ############
 ########################################
 #read channel: 0: current,.... 22: labview time
-    def read_channel(self,list):
+    def read_channel(self,*list):
         self.send("read_channel")
         result=[]
         msg = str(self.recv())
         data = msg.split(",")
-        list = list.split(",")
         for c in list:
             if int(c)==0: data[int(c)] = data[int(c)][2:]
             if int(c)==22: data[int(c)] = data[int(c)][:-1]
@@ -51,7 +50,7 @@ class Inst():
 #query z controller status    
     def zctrl_io_q(self):
         self.send("zctrl_io_q")
-        status = self.recv()
+        status = int(self.recv())
         return status
     
 #set z position (nm)
@@ -65,7 +64,7 @@ class Inst():
 #query z position (nm)
     def zctrl_z_q(self):
         self.send("zctrl_z_q")
-        height = self.recv()
+        height = float(self.recv())
         return height
 
 #set home absolute (nm)
@@ -102,7 +101,7 @@ class Inst():
 #query z setpoint (nA)
     def zctrl_setpoint_q(self):
         self.send("zctrl_setpoint_q")
-        setpoint = self.recv()
+        setpoint = float(self.recv())
         return setpoint       
 
 #set z PI P(pm) I(mS)
@@ -116,7 +115,7 @@ class Inst():
 #query z PI P(pm) I(mS)
     def zctrl_pi_q(self):
         self.send("zctrl_pi_q")
-        message = self.recv()
+        message = str(self.recv(),'utf-8')
         return message    
 
 ########################################
@@ -133,7 +132,7 @@ class Inst():
 #query bias value (V)
     def bias_bias_q(self):
         self.send("bias_bias_q")
-        bias = self.recv()
+        bias = float(self.recv())
         return bias
 
 #bias pulse (abs V) (S) (Z-hold on/off 1,0)
@@ -151,12 +150,14 @@ class Inst():
         if arg in ["on"]: self.send("bias_spec_io,1")
         elif arg in ["off"]: self.send("bias_spec_io,0")
         else: return "error"
-        return self.recv()        
+        result = str(self.recv(),'utf-8')
+        result= result[:-2]
+        return result     
 
 #query bias spectroscopy status (1:running, 0: stopped)
     def bias_spec_q(self):
         self.send("bias_spec_q")
-        status = self.recv()
+        status = int(self.recv())
         return status
 
 #set bias spectroscopy sweeping range (V)
@@ -170,12 +171,12 @@ class Inst():
 #query bias spectroscopy sweeping range (V)
     def bias_spec_sweep_q(self):
         self.send("bias_spec_sweep_q")
-        message = self.recv()
+        message = str(self.recv(),'utf-8')
         return message              
 
 #set bias spectroscopy sweeping channel (ex: 0,1,2,3)
-    def bias_spec_channel(self,channel):
-        self.send("bias_spec_channel,"+channel)
+    def bias_spec_channel(self,*channel):
+        self.send("bias_spec_channel,"+",".join(map(str,channel)))
         status = self.recv()
         return status
 

@@ -1,95 +1,106 @@
-########################################
-############  read_channel  ############
-########################################
-#read channel: 0: current,.... 22: labview time
-    def read_channel(self,list):
+# #######################################
+# ###########  read_channel  ############
+# #######################################
+print(nanonis.query('read_channel','0','22'))
+0: current,.... 22: labview time
+
+# #######################################
+# ###########  Z controller  ############
+# #######################################
+# switch on/off z controller or withdraw
+nanonis.query('zctrl_io','on')
+on: 'on'; off: 'off'
+
+# query z controller status    
+nanonis.query('zctrl_io_q')
+return (int)
+1: on; 0: off 
     
-# print(nanonis.query("read_channel('0,22')"))
+# set z position (int: nm)
+nanonis.query('zctrl_z_set',100)
+100nm: 100
 
-########################################
-############  Z controller  ############
-########################################
-#switch on/off z controller or withdraw
-    def zctrl_io(self,arg):
+# query z position (nm)
+nanonis.query('zctrl_z_q')
+return (float)XXX 
+in nm
 
-#query z controller status    
-    def zctrl_io_q(self):
-    
-#set z position (nm)
-    def zctrl_z_set(self,msg):
+# set home absolute (nm)
+nanonis.query('zctrl_z_home_absolute',100)
+100nm: 100
 
-#query z position (nm)
-    def zctrl_z_q(self):
+# set home relative (nm)
+nanonis.query('zctrl_z_home_relative',100)
+100nm: 100
 
-#set home absolute (nm)
-    def zctrl_z_home_absolute(self,msg):
+# set z home
+nanonis.query('zctrl_z_home')
 
-#set home relative (nm)
-    def zctrl_z_home_relative(self,msg):
+# set z setpoint (nA)
+nanonis.query('zctrl_setpoint',1.2)
+800pA: 0.8
 
-#set z home
-    def zctrl_z_home(self):
+# query z setpoint (nA)
+nanonis.query('zctrl_setpoint_q')
+return (float)XXX
+in nA
 
-#set z setpoint (nA)
-    def zctrl_setpoint(self,msg):
+# set z PI P(pm) I(mS)
+nanonis.query('zctrl_pi',50,1)
+P=50pm: 50
+I=1ms: 1
 
-#query z setpoint (nA)
-    def zctrl_setpoint_q(self):
+# query z PI P(pm) I(ms)
+nanonis.query('zctrl_pi_q')
+return (str)"P,I"
+P in pm
+I in ms
 
-#set z PI P(pm) I(mS)
-    def zctrl_pi(self):
+# #######################################
+# #########  Bias/Bias Spectrum #########
+# #######################################
+# set bias value (V)
+nanonis.query('bias_bias',-0.01)
+-10mV: -0.01
 
-#query z PI P(pm) I(mS)
-    def zctrl_pi(self):
+# query bias value (V)
+nanonis.query('bias_bias_q')
+return (float)XXX
+in V
 
-# print(nanonis.query("zctrl_io('on')"))
-# print(nanonis.query("zctrl_io('off')"))
-# print(nanonis.query("zctrl_io_q()"))
-# print(nanonis.query("zctrl_z_set('12')"))
-# print(nanonis.query("zctrl_z_q()"))
-# print(nanonis.query("zctrl_z_home()"))
-# print(nanonis.query("zctrl_z_home_absolute('32')"))
-# print(nanonis.query("zctrl_z_home_relative('2')"))
-# print(nanonis.query("zctrl_setpoint('0.012112121')"))
-# print(nanonis.query("zctrl_setpoint_q()"))
-# print(nanonis.query("zctrl_pi('30','1.0')"))
-# print(nanonis.query("zctrl_pi_q()"))
+# bias pulse (abs V) (S) (Z-hold on/off 1,0)
+nanonis.query('bias_pulse' , 1 , 0.01 , 0)
+1V: 1
+10ms: 0.01
+Z-hold-off: 0 (Z-hold off is the common one)
 
-########################################
-##########  Bias/Bias Spectrum #########
-########################################
-#set bias value (V)
-    def bias_bias(self,msg):
+# switch on/off bias spectroscopy (off: stop on: start)
+nanonis.query('bias_spec_io','on')
+return (str)XXX
+["bias, channelXXX, , channelYYY, ..."]
 
-#query bias value (V)
-    def bias_bias_q(self,msg):
+# query bias spectroscopy status (1:running, 0: stopped)
+nanonis.query('bias_spec_q')
+return (int)X
+1: running
+0: stopped
 
-#bias pulse (abs V) (S) (Z-hold on/off 1,0)
-    def bias_pulse(self,volt,duration,hold):
+# set bias spectroscopy sweeping range (V)
+nanonis.query('bias_spec_sweep',-0.2,0.2)
+from -200mV: -0.2
+to 200mV: 0.2
 
-#switch on/off bias spectroscopy (off: stop on: start)
-    def bias_spec_io(self,arg):
+# query bias spectroscopy sweeping range (V)
+nanonis.query('bias_spec_sweep_q')
+return (str)"XXX,YYY"
+from XXX (V)
+to YYY (V)
 
-#query bias spectroscopy status (1:running, 0: stopped)
-    def bias_spec_q(self):
-
-#set bias spectroscopy sweeping range (V)
-    def bias_spec_sweep(self,fromV,toV):
-
-#query bias spectroscopy sweeping range (V)
-    def bias_spec_sweep_q(self):
-
-#set bias spectroscopy sweeping channel (ex: 0,1,2,3)
-    def bias_spec_channel(self,channel):
-
-# print(nanonis.query("bias_bias('-0.4321')"))
-# print(nanonis.query("bias_bias_q()"))
-# print(nanonis.query("bias_pulse('-0.5','0.2',0)"))
-# print(nanonis.query("bias_spec_io('on')"))
-# print(nanonis.query("bias_spec_q()"))
-# print(nanonis.query("bias_spec_sweep('-0.1234','0.3210')"))
-# print(nanonis.query("bias_spec_sweep_q('')"))
-# print(nanonis.query("bias_spec_channel('0,1,2,4')"))
+# set bias spectroscopy sweeping channel (ex: 0,1,2,3)
+nanonis.query('bias_spec_channel',0,1,2)
+0: current
+1, LockinX
+2, LockinY
 
 ########################################
 ###############  Current  ##############

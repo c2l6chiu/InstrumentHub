@@ -88,7 +88,7 @@ class Coordinator():
             raise
         return result
     
-    def query(self,func,*arg):
+    def query(self,func,*arg):      #argument can be string,int,float
         '''
         new style: query(func,arg1,arg2)
         but also take old style query
