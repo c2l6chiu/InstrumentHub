@@ -1,9 +1,4 @@
 deal with:
-    if I key in inst nanonis
-    program will erro
-    and take no more input
-
-deal with:
     if I remove inst_nanonis
     then if I inst inst_nanonis
     it won't open it

@@ -187,7 +187,7 @@ class Inst():
 #query current (nA)
     def current(self):
         self.send("current")
-        message = self.recv()
+        message = float(self.recv())
         return message      
 
 ########################################
@@ -205,7 +205,7 @@ class Inst():
 #query walker voltage(V) freuqency(mS)
     def walker_setting_q(self):
         self.send("walker_setting_q")
-        status = self.recv()
+        status = str(self.recv(),'utf-8')
         return status
     
 #walk bipolar (will NOT hold until finish walking)
@@ -223,7 +223,7 @@ class Inst():
 #walk unipolar z (will NOT hold until finish walking)
     def walker_uni_walk(self,dir,step):
         dir = dir.lower()
-        dir_dict = ["+x","x+","-x","x-","+y","y+","-y","y-","+z","z+","-z","z-"]
+        dir_dict = ["+z","z+","-z","z-"]
         step_value = int(step)
         if dir not in dir_dict: return "error direction"
         if dir not in dir_dict[8:12]: return "only allow uni- in z"
@@ -262,7 +262,7 @@ class Inst():
 #query current x,y (nm)
     def move_q(self):
         self.send("move_q")
-        setpoint = self.recv()
+        setpoint = str(self.recv() , 'utf-8')
         return setpoint
     
 #set moving/scanning speed (nm/s)

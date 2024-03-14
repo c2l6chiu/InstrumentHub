@@ -216,6 +216,12 @@ class BootInstrument():
         self.debugMode = debugMode
 
     def boot(self):
+        dir_list = os.listdir(os.getcwd()+"/inst")
+        #check if the file exist
+        if self.name+'.py' not in dir_list:
+            print("instrument not found :(")
+            return
+        
         self.sys.queue_InstServer[self.name] = Queue()
         self.sys.port_InstServer[self.name] = self.sys.port_InstServer_available.pop()
         #laucn new interpreter

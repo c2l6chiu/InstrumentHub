@@ -61,7 +61,7 @@ class Inst():
         
         temperature = float(result.replace('R','').replace('\r', ''))
 
-        if temperature < 1 or temperature > 401:  return self.get_t(ser,n)
+        if temperature < 1 or temperature > 451:  return self.get_t(ser,n)
         else: return temperature
     
     def must_get_t(self,ser,n):

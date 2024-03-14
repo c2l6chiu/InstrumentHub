@@ -106,60 +106,65 @@ nanonis.query('bias_spec_channel',0,1,2)
 ###############  Current  ##############
 ########################################
 
-#query current, 1 data (nA)
-    def current(self):
-
-# print(nanonis.query("current()"))
+# query current, 1 data (nA)
+nanonis.query('current')
+return (float)XXX
+in nA
 
 ########################################
 ###############  Walker  ###############
 ########################################
 
-#set walker voltage(V) freuqency(mS)
-    def walker_setting(self,volt,freq):
+# set walker voltage(V) freuqency(Hz)
+nanonis.query('walker_setting',260,250)
+260: 260V
+250: 250Hz
 
-#query walker voltage(V) freuqency(mS)
-    def walker_setting_q(self):
+# query walker voltage(V) freuqency(Hz)
+nanonis.query('walker_setting_q')
+return (str)"XXX,YYY"
+XXX volt
+YYY Hz
 
-#walk bipolar (will NOT hold until finish walking)
-    def walker_walk(self,dir,step):
+# walk bipolar (will NOT hold until finish walking)
+nanonis.query('walker_walk','+x',100)
+direction: "+x","-x","+y","-y","+z","-z"
+100: 100steps
 
-#walk unipolar z (will NOT hold until finish walking)
-    def walker_uni_walk(self,dir,step):
+# walk unipolar z (will NOT hold until finish walking)
+nanonis.query('walker_uni_walk','-z',100)
+direction: "+z","-z"
+100: 100steps
 
-#walker stop immediately
-    def walker_stop(self):
+# walker stop immediately
+nanonis.query('walker_stop')
 
-# print(nanonis.query("walker_setting('123','321')"))
-# print(nanonis.query("walker_setting_q()"))
-# print(nanonis.query("walker_walk('z-','500')"))
-# print(nanonis.query("walker_uni_walk('x-','500')"))
-# print(nanonis.query("walker_stop()"))
+# #######################################
+# ##########  Move/Position  ############
+# #######################################
 
-########################################
-###########  Move/Position  ############
-########################################
+# move to x,y (nm)
+nanonis.query('move_move',200,-100)
+200: 200nm in X
+-100: -100nm in Y
 
-#move to x,y (nm)
-    def move_move(self,x,y):
+# stop follow me now!
+nanonis.query('move_stop')
 
-#stop follow me now!
-    def move_stop(self):
+# query current x,y (nm)
+nanonis.query('move_q')
+return (str)XXX,YYY
+XXX nm in X position
+YYY nm in Y position
 
-#query current x,y (nm)
-    def move_q(self):
+# set custom tip speed in follow me (nm/s) (check below method for setting scan speed)
+nanonis.query('move_speed',10)
+10: 10nm/s
 
-#set moving/scanning speed (nm/s)
-    def move_speed(self,speed):      
-
-#querry moving/scanning speed (nm/s)
-    def move_speed_q(self,speed):
-
-# print(nanonis.query("move_move('123','321')"))
-# print(nanonis.query("move_stop()"))
-# print(nanonis.query("move_q()"))
-# print(nanonis.query("move_speed('123')"))
-# print(nanonis.query("move_speed_q()"))
+# querry current selected tip speed in follow me, could be scan speed/custom (nm/s)
+nanonis.query('move_speed_q')
+return (float)XXX
+XXX in nm/s
 
 ########################################
 ################  Scan  ################
@@ -198,18 +203,6 @@ nanonis.query('bias_spec_channel',0,1,2)
 #query scan speed
     def scan_speed_q(self):
 
-# print(nanonis.query("scan_io('3','1')"))
-# print(nanonis.query("scan_io_q()"))
-# a = nanonis.query("scan_get('0','2')")
-# print(nanonis.query("scan_method(1,0,0,'test')"))
-# print(nanonis.query("scan_method_q()"))
-# print(nanonis.query("scan_res(32,32,'[0,1,14]')"))
-# print(nanonis.query("scan_res_q()"))
-# print(nanonis.query("scan_pos(1.1,1.2,13,14,23)"))
-# print(nanonis.query("scan_pos_q()"))
-# print(nanonis.query("scan_speed(5,4)"))
-# print(nanonis.query("scan_speed_q()"))
-
 ########################################
 ################  Grid  ################
 ########################################
@@ -233,11 +226,4 @@ nanonis.query('bias_spec_channel',0,1,2)
 
 #query the modulation/demodulation channel: mod, demod
     def lockin_channel_q(self):
-
-# print(nanonis.query("lockin_io('on')")) 
-# print(nanonis.query("lockin_io('off')")) 
-# print(nanonis.query("lockin_setting('2.25','2501','-48.448')"))
-# print(nanonis.query("lockin_setting_q()")) 
-# print(nanonis.query("lockin_channel('0','1')"))
-# print(nanonis.query("lockin_channel_q()")) 
 

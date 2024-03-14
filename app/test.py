@@ -40,6 +40,6 @@ from ApplicationKernel import AppServer
 app = AppServer("TPot")
 nanonis = app.addInstrument('inst_nanonis')
 a = \
-nanonis.query('bias_spec_channel',0,1,2)
+nanonis.query('move_speed_q')
 
 print(a)
