@@ -40,20 +40,22 @@ class System():
     authkey_inst_app = b'vf@pnml9876'
 
 
-    def __init__(self):
-        # os.chdir(r'C:\Users\VFSTM-PC3\Documents\InstrumentHub\InstrumentHub')
+    def __init__(self,pre_instrument_list):
+        self.pre_instrument_list = pre_instrument_list
         self.load_inst_list()
 
+        # greeting:
+        self.print_seperator()
+        print('Amoebas version: '+self.version)
+        self.print_seperator()
 
-    # def __del__(self):
-        # self.status = False  #this will shut down AppServer, shell
-        # inst = []
-        # for ser in self.InstServer_thread_pool:
-        #     inst.append(ser)
-        # for ser in inst:
-        #     self.kill_InstServ_and_Inst(ser)
+
+    def __del__(self):
+        self.status = False  #this will shut down AppServer, shell
+        print("dead")
 
     def load_inst_list(self):
+        self.inst_list = []
         for file in os.listdir(os.getcwd()+'/inst'):
             if 'inst_' in file:
                 self.inst_list.append(file.strip('.py'))
@@ -78,21 +80,6 @@ class System():
 
     def print_seperator(self):
         print("==============================")
-
-class Shell():
-    def __init__(self,jobs,sys):
-        self.jobs = jobs
-        self.sys = sys
-        sys.print_seperator()
-        print('Amoebas version: '+sys.version)
-        sys.print_seperator()
-        
-
-    def run(self):
-        while self.sys.status:
-            data = str(input())
-            self.jobs.put(data)
-            # if data in ['exit',"quit","stop","exit()" ]: break
 
 
 class AppServer():
@@ -138,7 +125,7 @@ class AppServer():
                             for i in range(len(ports)):
                                 message = ("close",ports[i])
                                 self.sys.queue_InstServer[insts[i]].put(message)
-                                print("release ports:",ports[i],"from instrument: ", insts[i])
+                                print("instrument: ", insts[i],", release ports:",ports[i], ', from: ',pieces[2],'-',pieces[3])
 
                             #let application know the address , port number, authkey
                             result = b"bye"

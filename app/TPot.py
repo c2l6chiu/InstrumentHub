@@ -406,9 +406,12 @@ class Widget(QWidget):
 
     @Slot()
     def change_yScale(self):
-        bottom , top = (float(self.ui.lineEdit_ymin.text()) , float(self.ui.lineEdit_ymax.text()))
-        self.ui.ax.set_ylim(bottom , top)
-        self.update()
+        try:
+            bottom , top = (float(self.ui.lineEdit_ymin.text()) , float(self.ui.lineEdit_ymax.text()))
+            self.ui.ax.set_ylim(bottom , top)
+            self.update()
+        except:
+            pass
 
     @Slot()
     def autoScale(self):

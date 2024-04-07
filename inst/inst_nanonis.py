@@ -285,13 +285,13 @@ class Inst():
 
 #start scan (action 0:stop 1: start 2: pause 3: resume) (direction 0:up scan 1:down scan)
     def scan_io(self,action,direction):
-        if action in ["start","1"]: action = "1"
-        elif action in ["stop","0"]: action = "0"
-        elif action in ["pause","2"]: action = "2"
-        elif action in ["resume","3"]: action = "3"
+        if action.lower() in ["start",1,'1']: action = "1"
+        elif action.lower() in ["stop",0,"0"]: action = "0"
+        elif action.lower() in ["pause",2,"2"]: action = "2"
+        elif action.lower() in ["resume",3,"3"]: action = "3"
         else: return "error action"
-        if direction in ["up","0"]: direction = "0"
-        elif direction in ["down","1"]: direction = "1"
+        if direction.lower() in ["up",0,"0"]: direction = "0"
+        elif direction.lower() in ["down",1,"1"]: direction = "1"
         else: return "error directoin"     
         self.send("scan_io,"+action+","+direction)
         return self.recv()
@@ -299,18 +299,18 @@ class Inst():
 #query scan status 0: False 1: True
     def scan_io_q(self):
         self.send("scan_io_q")
-        return self.recv().decode('utf-8').split(',')
+        return str(self.recv(),'utf-8')
 
 #receive last scanned data (channel: only one) (direction: 1: forward 2: backward) (always down scan:up to down)
     def scan_get(self,channel,direction):
         if not channel in [str(i) for i in range(24)]: return "error channel"
         if direction in ["1","forward",1]: direction="1"
-        elif direction in ["2","forward",2]: direction="2"
+        elif direction in ["2","backward",2]: direction="2"
         else: return "error direction"
         self.send("scan_get,"+channel+","+direction)
-        result = self.recv().decode('utf-8')
-        result = result[:-2].split(',')
-        result = list(map(float,result))
+        result = str(self.recv(),'utf-8')
+        result = result[:-2]
+        # result = list(map(float,result))
         return result
 
 

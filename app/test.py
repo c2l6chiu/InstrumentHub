@@ -34,12 +34,17 @@
 
 # print(SR.query("harm('1')"))
 # print(SR.query("harm_q()"))
-
+import matplotlib.pyplot as plt
 from ApplicationKernel import AppServer
 
 app = AppServer("TPot")
 nanonis = app.addInstrument('inst_nanonis')
 a = \
-nanonis.query('move_speed_q')
+nanonis.query('scan_get',1,'forward')
 
-print(a)
+
+n = len(a.split(','))
+# plt.imshow(a)
+
+
+print(n)

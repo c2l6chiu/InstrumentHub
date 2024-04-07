@@ -1,4 +1,4 @@
-# import pyvisa
+import pyvisa
 import telnetlib
 import time
 
@@ -12,15 +12,16 @@ class Inst():
                         '1000s','3000s']
         self.timeout=0.1
         
-        # self.rm = pyvisa.ResourceManager()
+        self.rm = pyvisa.ResourceManager()
         # self.rm.list_resources()
         
-        # self.inst = self.rm.open_resource('TCPIP0::10.0.0.4::inst0::INSTR')
-        HOST = '10.0.0.4'
-        self.inst = telnetlib.Telnet(HOST)
-        self.inst.read_some()
+        self.inst = self.rm.open_resource('TCPIP0::10.0.0.4::inst0::INSTR')
+        # HOST = '10.0.0.4'
+        # self.inst = telnetlib.Telnet(HOST)
+        # self.inst.read_some()
 
     def __del__(self):
+        # self.osc(0)
         # self.rm.close()
         pass
 
@@ -117,34 +118,27 @@ class Inst():
         return
     
     def query(self,msg):
-        self.inst.read_until(b'\r',timeout=0.01)
-        result = b''
-        count = 0
-        while len(result)==0:
-            self.inst.write((msg+'\r').encode())
-            time.sleep(0.01)
-            result = self.inst.read_until(b'\r',timeout=self.timeout)
-            count+=1
-            if count>5: break
-            time.sleep(0.02)
-        self.inst.read_until(b'\r',timeout=0.01)
+        # self.inst.read_until(b'\r',timeout=0.01)
+        # result = b''
+        # count = 0
+        # while len(result)==0:
+        #     self.inst.write((msg+'\r').encode())
+        #     time.sleep(0.01)
+        #     result = self.inst.read_until(b'\r',timeout=self.timeout)
+        #     count+=1
+        #     if count>5: break
+        #     time.sleep(0.02)
+        # self.inst.read_until(b'\r',timeout=0.01)
+
+
+        result = self.inst.query(msg)
+
         return result
     
     def write(self,msg):
-        self.inst.read_until(b'\r',timeout=0.01)
-        self.inst.write((msg+'\r').encode())
-        self.inst.read_until(b'\r',timeout=0.01)
+        # self.inst.read_until(b'\r',timeout=0.01)
+        # self.inst.write((msg+'\r').encode())
+        # self.inst.read_until(b'\r',timeout=0.01)
         
 
-# print(SR.query("sens('50mV')"))
-# print(SR.query("sens_q()"))
-# print(SR.query("osc('0.001')"))
-# print(SR.query("osc_q()"))
-# print(SR.query("freq('4001')"))
-# print(SR.query("fre_q()"))
-# print(SR.query("tconst('3ms')"))
-# print(SR.query("tconst_q()"))
-# print(SR.query("phi(28.256095983)"))
-# print(SR.query("phi_q()"))
-# print(SR.query("harm('1')"))
-# print(SR.query("harm_q()"))
+        self.inst.write(msg)

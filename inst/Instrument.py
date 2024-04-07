@@ -98,7 +98,7 @@ while True:
         for port in ser_pool:
             ser_pool[port].status = False
 
-        exec("exit()")
+        break
     #implement the shut down here
     #stop controller
     #stop all the serviceLine
@@ -115,3 +115,4 @@ while True:
 
 
 
+exec("exit()")

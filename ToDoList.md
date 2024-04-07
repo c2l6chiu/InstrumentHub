@@ -1,7 +1,5 @@
-deal with:
-    if I remove inst_nanonis
-    then if I inst inst_nanonis
-    it won't open it
+deal with exit command
+    be able to exit instrument
 
 
 deal with:
@@ -11,7 +9,6 @@ deal with:
 cntrl-C process:
 two type of applicatoin: integrated cosole or hidden console
 
-Integrate matlab to here?
 Finish Ardrino / Keithley
 
 Subprocess for instrument and application:
